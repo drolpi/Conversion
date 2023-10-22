@@ -25,9 +25,9 @@ plugins {
 defaultTasks("build", "test", "shadowJar")
 
 allprojects {
-    group = "org.aero.common"
+    group = "de.drolpi.conversion"
     version = "1.0.0-SNAPSHOT"
-    description = "A common core library"
+    description = "A library to coerce an input value to another type"
 
     repositories {
         mavenCentral()
@@ -100,8 +100,8 @@ extensions.configure<NexusPublishExtension> {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
 
-            username.set(java.lang.System.getenv("SONATYPE_USER"))
-            password.set(java.lang.System.getenv("SONATYPE_TOKEN"))
+            username.set(System.getenv("SONATYPE_USER"))
+            password.set(System.getenv("SONATYPE_TOKEN"))
         }
     }
 
