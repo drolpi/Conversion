@@ -16,9 +16,17 @@
 
 package de.drolpi.conversion.core.converter;
 
-/**
- * Represents a converter which can be executed conditionally, based on attributes of the {@code sourceType} and {@code targetType}.
- */
-public non-sealed interface ConditionalConverter extends Converter<Object, Object>, ConverterCondition {
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Type;
+
+public abstract non-sealed class ScalarConverter<T, U> implements Converter<T, U> {
+
+    @Override
+    public final @NotNull U convert(@NotNull T source, @NotNull Type sourceType, @NotNull Type targetType) {
+        return null;
+    }
+
+    public abstract @NotNull U convert(@NotNull T source);
 
 }

@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core.converter;
+package de.drolpi.conversion.core.impl;
 
-/**
- * Represents a converter which can be executed conditionally, based on attributes of the {@code sourceType} and {@code targetType}.
- */
-public non-sealed interface ConditionalConverter extends Converter<Object, Object>, ConverterCondition {
+import de.drolpi.conversion.core.converter.ConditionalConverter;
+import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
+
+public class MapToMapConverter implements ConditionalConverter {
+
+    @Override
+    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        return false;
+    }
+
+    @Override
+    public @NotNull Object convert(@NotNull Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        return null;
+    }
 }

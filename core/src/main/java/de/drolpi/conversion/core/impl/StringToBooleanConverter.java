@@ -16,13 +16,13 @@
 
 package de.drolpi.conversion.core.impl;
 
-import de.drolpi.conversion.core.converter.Converter;
+import de.drolpi.conversion.core.converter.ScalarConverter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.Set;
 
-public final class StringToBooleanConverter implements Converter<String, Boolean> {
+public final class StringToBooleanConverter extends ScalarConverter<String, Boolean> {
 
     private static final Set<String> TRUE_VALUES = Set.of("true", "t", "on", "yes", "y", "1");
     private static final Set<String> FALSE_VALUES = Set.of("false", "f", "off", "no", "n", "0");
