@@ -19,17 +19,8 @@ package de.drolpi.conversion.core;
 import de.drolpi.conversion.core.converter.Converter;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Type;
+public interface ConverterRegistry {
 
-final class ConversionBusImpl implements ConverterRegistry, ConversionBus {
+    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
 
-    @Override
-    public <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter) {
-
-    }
-
-    @Override
-    public @NotNull Object convert(@NotNull Object source, @NotNull Type targetType) {
-        return null;
-    }
 }
