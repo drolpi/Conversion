@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Type;
 
 /**
- * Represents a condition that checks whether a {@link Converter} is suitable based on the attributes of the {@code source} and {@code target}.
+ * Represents a condition that checks whether a {@link Converter} is suitable based on the attributes of the {@code sourceType} and {@code targetType}.
  */
 public interface ConverterCondition {
 
