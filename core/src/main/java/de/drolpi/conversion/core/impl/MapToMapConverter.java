@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
-public class MapToMapConverter implements ConditionalConverter {
+public final class MapToMapConverter implements ConditionalConverter {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
