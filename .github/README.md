@@ -1,9 +1,9 @@
-# Template
+# Conversion
 
-[![license](https://img.shields.io/github/license/AeroService/Template?style=for-the-badge&color=b2204c)](../LICENSE)
+[![license](https://img.shields.io/github/license/drolpi/Conversion?style=for-the-badge&color=b2204c)](../LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=for-the-badge)](https://github.com/RichardLitt/standard-readme)
 
-A template repository for all others projects
+A library to coerce an input value to another type
 
 # Table of contents
 
