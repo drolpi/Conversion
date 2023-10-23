@@ -24,7 +24,7 @@ public abstract non-sealed class ScalarConverter<T, U> implements Converter<T, U
 
     @Override
     public final @NotNull U convert(@NotNull T source, @NotNull Type sourceType, @NotNull Type targetType) {
-        return null;
+        return this.convert(source);
     }
 
     public abstract @NotNull U convert(@NotNull T source);
