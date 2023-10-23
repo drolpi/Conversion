@@ -20,8 +20,9 @@ import de.drolpi.conversion.core.converter.ConditionalConverter;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
-public final class MapToMapConverter implements ConditionalConverter {
+public final class MapToMapConverter implements ConditionalConverter<Map<Object, Object>, Map<Object, Object>> {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
@@ -29,7 +30,7 @@ public final class MapToMapConverter implements ConditionalConverter {
     }
 
     @Override
-    public @NotNull Object convert(@NotNull Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @NotNull Map<Object, Object> convert(@NotNull Map<Object, Object> source, @NotNull Type sourceType, @NotNull Type targetType) {
         return null;
     }
 }
