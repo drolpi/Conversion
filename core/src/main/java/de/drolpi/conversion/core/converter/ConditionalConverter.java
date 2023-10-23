@@ -18,7 +18,10 @@ package de.drolpi.conversion.core.converter;
 
 /**
  * Represents a converter which can be executed conditionally, based on attributes of the {@code sourceType} and {@code targetType}.
+ *
+ * @param <T> the source type
+ * @param <U> the target type
  */
-public non-sealed interface ConditionalConverter extends Converter<Object, Object>, ConverterCondition {
+public non-sealed interface ConditionalConverter<T, U> extends Converter<T, U>, ConverterCondition {
 
 }
