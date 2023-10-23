@@ -16,13 +16,20 @@
 
 package de.drolpi.conversion.core.impl;
 
-import de.drolpi.conversion.core.converter.ConditionalConverter;
+import de.drolpi.conversion.core.converter.GenericConverter;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
-public final class MapToMapConverter implements ConditionalConverter<Map<Object, Object>, Map<Object, Object>> {
+public final class MapToMapConverter implements GenericConverter {
+
+    @Override
+    public @NotNull Set<ConversionPath> paths() {
+        return Collections.singleton(new ConversionPath(Map.class, Map.class));
+    }
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
@@ -30,7 +37,7 @@ public final class MapToMapConverter implements ConditionalConverter<Map<Object,
     }
 
     @Override
-    public @NotNull Map<Object, Object> convert(@NotNull Map<Object, Object> source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @NotNull Object convert(@NotNull Object source, @NotNull Type sourceType, @NotNull Type targetType) {
         return null;
     }
 }
