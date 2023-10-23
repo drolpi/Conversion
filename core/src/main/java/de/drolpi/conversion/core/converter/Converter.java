@@ -18,14 +18,15 @@ package de.drolpi.conversion.core.converter;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
+
 /**
  * Represents a converter to convert a source object of type {@code T} to a target object of type {@code U}.
  *
  * @param <T> the source type
  * @param <U> the target type
  */
-@FunctionalInterface
-public interface Converter<T, U> {
+public interface Converter<T, U>  {
 
     /**
      * Returns the target object of the conversion from the source object of type {@code S} to target type {@code T}.
@@ -33,6 +34,6 @@ public interface Converter<T, U> {
      * @param source the source object to convert, which must be an instance of {@code S} (never {@code null})
      * @return the converted object, which must be an instance of {@code T} (potentially {@code null})
      */
-    @NotNull U convert(@NotNull T source);
+    @NotNull U convert(@NotNull T source, @NotNull Type sourceType, @NotNull Type targetType);
 
 }

@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core;
+package de.drolpi.conversion.core.impl;
 
-import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
+import de.drolpi.conversion.core.converter.ConditionalConverter;
 import org.jetbrains.annotations.NotNull;
 
-public interface ConverterRegistry {
+import java.lang.reflect.Type;
+import java.util.Map;
 
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
+public final class MapToMapConverter implements ConditionalConverter<Map<Object, Object>, Map<Object, Object>> {
 
-    void register(@NotNull GenericConverter converter);
+    @Override
+    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        return false;
+    }
 
+    @Override
+    public @NotNull Map<Object, Object> convert(@NotNull Map<Object, Object> source, @NotNull Type sourceType, @NotNull Type targetType) {
+        return null;
+    }
 }

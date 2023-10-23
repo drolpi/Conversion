@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core;
+package de.drolpi.conversion.core.converter;
 
-import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
 import org.jetbrains.annotations.NotNull;
 
-public interface ConverterRegistry {
+import java.util.Set;
 
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
+public interface GenericConverter extends ConditionalConverter<Object, Object> {
 
-    void register(@NotNull GenericConverter converter);
+    @NotNull Set<ConversionPath> paths();
 
+    record ConversionPath(@NotNull Class<?> sourceType, @NotNull Class<?> targetType) {
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+
+            if (!(other instanceof ConversionPath otherPath)) {
+                return false;
+            }
+
+            return (this.sourceType == otherPath.sourceType && this.targetType == otherPath.targetType);
+        }
+
+    }
 }

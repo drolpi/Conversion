@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core;
+package de.drolpi.conversion.core.converter;
 
-import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
-import org.jetbrains.annotations.NotNull;
-
-public interface ConverterRegistry {
-
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
-
-    void register(@NotNull GenericConverter converter);
+/**
+ * Represents a converter which can be executed conditionally, based on attributes of the {@code sourceType} and {@code targetType}.
+ *
+ * @param <T> the source type
+ * @param <U> the target type
+ */
+public interface ConditionalConverter<T, U> extends Converter<T, U>, ConverterCondition {
 
 }

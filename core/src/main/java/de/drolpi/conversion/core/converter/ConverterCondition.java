@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core;
+package de.drolpi.conversion.core.converter;
 
-import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
 import org.jetbrains.annotations.NotNull;
 
-public interface ConverterRegistry {
+import java.lang.reflect.Type;
 
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
+/**
+ * Represents a condition that checks whether a {@link Converter} is suitable based on the attributes of the {@code sourceType} and {@code targetType}.
+ */
+public interface ConverterCondition {
 
-    void register(@NotNull GenericConverter converter);
+    /**
+     * Returns whether this condition is suitable or not.
+     *
+     * @param sourceType the source type we are converting from
+     * @param targetType the target type we are converting to
+     * @return true, if this condition is true, false if not
+     */
+    boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType);
 
 }
