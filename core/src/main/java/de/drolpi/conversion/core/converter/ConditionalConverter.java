@@ -22,6 +22,6 @@ package de.drolpi.conversion.core.converter;
  * @param <T> the source type
  * @param <U> the target type
  */
-public non-sealed interface ConditionalConverter<T, U> extends Converter<T, U>, ConverterCondition {
+public interface ConditionalConverter<T, U> extends Converter<T, U>, ConverterCondition {
 
 }

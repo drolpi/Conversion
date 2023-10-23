@@ -16,19 +16,20 @@
 
 package de.drolpi.conversion.core.impl;
 
-import de.drolpi.conversion.core.converter.ScalarConverter;
+import de.drolpi.conversion.core.converter.Converter;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
 import java.util.Locale;
 import java.util.Set;
 
-public final class StringToBooleanConverter extends ScalarConverter<String, Boolean> {
+public final class StringToBooleanConverter implements Converter<String, Boolean> {
 
     private static final Set<String> TRUE_VALUES = Set.of("true", "t", "on", "yes", "y", "1");
     private static final Set<String> FALSE_VALUES = Set.of("false", "f", "off", "no", "n", "0");
 
     @Override
-    public @NotNull Boolean convert(@NotNull String source) {
+    public @NotNull Boolean convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
         final String trimmed = source.trim().toLowerCase(Locale.ROOT);
 
         if (TRUE_VALUES.contains(trimmed)) {

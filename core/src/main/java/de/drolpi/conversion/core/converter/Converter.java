@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
  * @param <T> the source type
  * @param <U> the target type
  */
-public sealed interface Converter<T, U> permits ScalarConverter, ConditionalConverter {
+public interface Converter<T, U>  {
 
     /**
      * Returns the target object of the conversion from the source object of type {@code S} to target type {@code T}.
