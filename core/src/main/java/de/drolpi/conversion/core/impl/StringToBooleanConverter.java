@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.converter.Converter;
+import de.drolpi.conversion.core.exception.ConversionFailedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -40,7 +41,6 @@ public final class StringToBooleanConverter implements Converter<String, Boolean
             return Boolean.FALSE;
         }
 
-        //TODO: throw exception instead of returning null
-        return null;
+        throw new ConversionFailedException(sourceType, targetType, source);
     }
 }
