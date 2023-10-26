@@ -18,12 +18,27 @@ package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.GenericConverter;
+import de.drolpi.conversion.core.exception.ConverterNotFoundException;
 import org.jetbrains.annotations.NotNull;
 
-public interface ConverterRegistry {
+import java.lang.reflect.Type;
 
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<? extends U, ? extends V> converter);
+non-sealed class BasicConversionBus implements ConverterRegistry, ConversionBus {
 
-    void register(@NotNull GenericConverter converter);
+    @Override
+    public <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target,
+        @NotNull Converter<? extends U, ? extends V> converter
+    ) {
 
+    }
+
+    @Override
+    public void register(@NotNull GenericConverter converter) {
+
+    }
+
+    @Override
+    public @NotNull Object convert(@NotNull Object source, @NotNull Type targetType) {
+        throw new ConverterNotFoundException(source.getClass(), targetType);
+    }
 }

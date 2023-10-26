@@ -16,26 +16,16 @@
 
 package de.drolpi.conversion.core;
 
-import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
-import org.jetbrains.annotations.NotNull;
+import de.drolpi.conversion.core.impl.MapToMapConverter;
+import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 
-import java.lang.reflect.Type;
+class DefaultConversionBus extends BasicConversionBus {
 
-final class ConversionBusImpl implements ConverterRegistry, ConversionBus {
+    public DefaultConversionBus() {
+        //Scalar converters
+        this.register(String.class, Boolean.class, new StringToBooleanConverter());
 
-    @Override
-    public <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter) {
-
-    }
-
-    @Override
-    public void register(@NotNull GenericConverter converter) {
-
-    }
-
-    @Override
-    public @NotNull Object convert(@NotNull Object source, @NotNull Type targetType) {
-        return null;
+        //Collection converters
+        this.register(new MapToMapConverter());
     }
 }
