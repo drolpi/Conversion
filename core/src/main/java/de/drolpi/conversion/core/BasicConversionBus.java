@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-class BasicConversionBus implements ConverterRegistry, ConversionBus {
+class BasicConversionBus implements ConfigurableConversionBus {
 
     private static final NoOpConverter NO_MATCH_CONVERTER = new NoOpConverter();
 
