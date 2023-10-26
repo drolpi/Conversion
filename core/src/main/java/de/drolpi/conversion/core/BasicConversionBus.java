@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class BasicConversionBus implements ConfigurableConversionBus {
 
     private static final NoOpConverter NO_MATCH_CONVERTER = new NoOpConverter();
+    private static final NoOpConverter NO_OP_CONVERTER = new NoOpConverter();
 
     private final ConverterStorage storage = new ConverterStorage();
     private final Map<CacheKey, GenericConverter> cache = new ConcurrentHashMap<>(64);
@@ -43,12 +44,16 @@ class BasicConversionBus implements ConfigurableConversionBus {
     public <U, V> void register(@NotNull final Class<? extends U> sourceType, final @NotNull Class<V> targetType,
         @NotNull final Converter<? extends U, ? extends V> converter
     ) {
+        // Register via adapter (GenericConverter)
         this.register(new ConverterAdapter(converter, sourceType, targetType));
     }
 
     @Override
     public void register(@NotNull final GenericConverter converter) {
+        // Register in storage
         this.storage.register(converter);
+
+        // Invalidate cache because maybe previously not possible conversions are possible now
         this.invalidateCache();
     }
 
@@ -59,12 +64,34 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     private @Nullable GenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
         final CacheKey cacheKey = new CacheKey(sourceType, targetType);
-        final GenericConverter converter = this.cache.get(cacheKey);
+
+        // Take a look at the cache to see if this conversion has been done before
+        GenericConverter converter = this.cache.get(cacheKey);
 
         if (converter != null) {
+            // Check whether a converter was found in the previous conversion or not
             return converter != NO_MATCH_CONVERTER ? converter : null;
         }
 
+        // Try to get converter from storage
+        converter = this.storage.converter(sourceType, targetType);
+
+        // Check whether a conversion is necessary at all
+        if (converter == null && sourceType == targetType) {
+
+            // Use a non-operating converter
+            converter = NO_OP_CONVERTER;
+        }
+
+        // Check whether the converter is suitable or not
+        if (converter != null) {
+            // Cache the suitable converter
+            this.cache.put(cacheKey, converter);
+            return converter;
+        }
+
+        // Cache that no suitable converter was found
+        this.cache.put(cacheKey, NO_MATCH_CONVERTER);
         return null;
     }
 
