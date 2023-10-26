@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
-public sealed interface ConversionBus permits BasicConversionBus {
+public interface ConversionBus {
 
     @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
 
