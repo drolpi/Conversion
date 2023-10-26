@@ -22,6 +22,10 @@ import java.lang.reflect.Type;
 
 public interface ConversionBus {
 
+    static @NotNull ConfigurableConversionBus create() {
+        return new BasicConversionBus();
+    }
+
     @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
 
 }
