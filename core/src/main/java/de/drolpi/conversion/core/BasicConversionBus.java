@@ -164,12 +164,9 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         public GenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
-            final Class<?> erasedSourceType = GenericTypeReflector.erase(sourceType);
-            final Class<?> erasedTargetType = GenericTypeReflector.erase(targetType);
-
             // Search the full type tree
-            final List<Class<?>> sourceTree = this.collectClassTree(erasedSourceType);
-            final List<Class<?>> targetTree = this.collectClassTree(erasedTargetType);
+            final List<Class<?>> sourceTree = this.collectClassTree(sourceType);
+            final List<Class<?>> targetTree = this.collectClassTree(targetType);
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
@@ -209,12 +206,13 @@ class BasicConversionBus implements ConfigurableConversionBus {
             return null;
         }
 
-        private @NotNull List<Class<?>> collectClassTree(@NotNull final Class<?> type) {
+        private @NotNull List<Class<?>> collectClassTree(@NotNull final Type type) {
+            final Class<?> erasedType = GenericTypeReflector.erase(GenericTypeReflector.box(type));
             final List<Class<?>> tree = new ArrayList<>(20);
             final Set<Class<?>> visited = new HashSet<>(20);
 
-            this.collectClass(0, type, false, tree, visited);
-            final boolean array = type.isArray();
+            this.collectClass(0, erasedType, false, tree, visited);
+            final boolean array = erasedType.isArray();
 
             // Walk through super class tree
             for (int i = 0; i < tree.size(); i++) {
@@ -230,7 +228,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
 
             // Check whether the type is an enum or not
-            if (Enum.class.isAssignableFrom(type)) {
+            if (Enum.class.isAssignableFrom(erasedType)) {
                 this.collectClass(tree.size(), Enum.class, array, tree, visited);
                 this.collectClass(tree.size(), Enum.class, false, tree, visited);
                 this.collectInterfaces(Enum.class, array, tree, visited);
