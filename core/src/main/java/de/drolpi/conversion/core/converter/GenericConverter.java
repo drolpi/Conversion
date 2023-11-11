@@ -38,6 +38,5 @@ public interface GenericConverter extends ConditionalConverter<Object, Object> {
 
             return (this.sourceType == otherPath.sourceType && this.targetType == otherPath.targetType);
         }
-
     }
 }

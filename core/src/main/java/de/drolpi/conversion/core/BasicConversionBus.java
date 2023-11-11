@@ -171,7 +171,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
                     final GenericConverter.ConversionPath path = new GenericConverter.ConversionPath(sourceCandidate, targetCandidate);
-                    final GenericConverter converter = this.converter(sourceType, targetType, path);
+                    final GenericConverter converter = this.converter(path);
 
                     if (converter != null) {
                         return converter;
@@ -181,15 +181,13 @@ class BasicConversionBus implements ConfigurableConversionBus {
             return null;
         }
 
-        private GenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType,
-            @NotNull final GenericConverter.ConversionPath path
-        ) {
+        private GenericConverter converter(@NotNull final GenericConverter.ConversionPath path) {
             // Check specifically registered converters
             final Deque<GenericConverter> convertersForPath = this.converters.get(path);
 
             if (convertersForPath != null) {
                 for (final GenericConverter converter : convertersForPath) {
-                    if (!converter.isSuitable(sourceType, targetType)) {
+                    if (!converter.isSuitable(path.sourceType(), path.targetType())) {
                         continue;
                     }
                     return converter;
@@ -197,8 +195,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
 
             // Check ConditionalConverters for a dynamic match
-            for (GenericConverter converter : this.globalConverters) {
-                if (converter.isSuitable(sourceType, targetType)) {
+            for (final GenericConverter converter : this.globalConverters) {
+                if (converter.isSuitable(path.sourceType(), path.targetType())) {
                     return converter;
                 }
             }
