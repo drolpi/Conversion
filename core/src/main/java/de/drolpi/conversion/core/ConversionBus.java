@@ -26,6 +26,10 @@ public interface ConversionBus {
         return new BasicConversionBus();
     }
 
+    static @NotNull ConfigurableConversionBus createDefault() {
+        return new DefaultConversionBus();
+    }
+
     @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
 
 }
