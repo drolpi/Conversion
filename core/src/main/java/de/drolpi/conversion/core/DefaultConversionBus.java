@@ -16,16 +16,16 @@
 
 package de.drolpi.conversion.core;
 
-import org.jetbrains.annotations.NotNull;
+import de.drolpi.conversion.core.impl.MapToMapConverter;
+import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 
-import java.lang.reflect.Type;
+class DefaultConversionBus extends BasicConversionBus {
 
-public interface ConversionBus {
+    public DefaultConversionBus() {
+        //Scalar converters
+        this.register(String.class, Boolean.class, new StringToBooleanConverter());
 
-    static @NotNull ConfigurableConversionBus create() {
-        return new BasicConversionBus();
+        //Collection converters
+        this.register(new MapToMapConverter());
     }
-
-    @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
-
 }

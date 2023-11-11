@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ConverterRegistry {
 
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
+    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<? extends U, ? extends V> converter);
 
     void register(@NotNull GenericConverter converter);
 
