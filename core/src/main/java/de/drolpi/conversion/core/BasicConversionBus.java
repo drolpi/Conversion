@@ -16,24 +16,31 @@
 
 package de.drolpi.conversion.core;
 
+import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.GenericConverter;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
+import de.drolpi.conversion.core.util.ClassTreeUtil;
+import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 class BasicConversionBus implements ConfigurableConversionBus {
 
     private static final NoOpConverter NO_MATCH_CONVERTER = new NoOpConverter();
     private static final NoOpConverter NO_OP_CONVERTER = new NoOpConverter();
 
-    private final ConverterStorage storage = new ConverterStorage();
+    private final ConverterRegistrar registrar = new ConverterRegistrar();
     private final Map<CacheKey, GenericConverter> cache = new ConcurrentHashMap<>(64);
 
     BasicConversionBus() {
@@ -51,7 +58,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
     @Override
     public void register(@NotNull final GenericConverter converter) {
         // Register in storage
-        this.storage.register(converter);
+        this.registrar.add(converter);
 
         // Invalidate cache because maybe previously not possible conversions are possible now
         this.invalidateCache();
@@ -59,7 +66,14 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     @Override
     public @NotNull Object convert(@NotNull final Object source, @NotNull final Type targetType) {
-        throw new ConverterNotFoundException(source.getClass(), targetType);
+        final Converter<Object, Object> converter = this.converter(source.getClass(), targetType);
+
+        if (converter == null) {
+            // No Converter found
+            throw new ConverterNotFoundException(source.getClass(), targetType);
+        }
+
+        return converter.convert(source, source.getClass(), targetType);
     }
 
     private @Nullable GenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
@@ -73,12 +87,11 @@ class BasicConversionBus implements ConfigurableConversionBus {
             return converter != NO_MATCH_CONVERTER ? converter : null;
         }
 
-        // Try to get converter from storage
-        converter = this.storage.converter(sourceType, targetType);
+        // Try to get converter from registrar
+        converter = this.registrar.find(sourceType, targetType);
 
         // Check whether a conversion is necessary at all
         if (converter == null && sourceType == targetType) {
-
             // Use a non-operating converter
             converter = NO_OP_CONVERTER;
         }
@@ -121,8 +134,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
                 return false;
             }
 
-            //TODO:
-            return true;
+            return !(this.converter instanceof ConditionalConverter conditionalConverter) ||
+                conditionalConverter.isSuitable(sourceType, targetType);
         }
 
         @Override
@@ -131,15 +144,67 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
     }
 
-    private static final class ConverterStorage {
+    private static final class ConverterRegistrar {
 
-        //TODO:
+        private final Set<GenericConverter> globalConverters = new CopyOnWriteArraySet<>();
+        private final Map<GenericConverter.ConversionPath, Deque<GenericConverter>> converters = new ConcurrentHashMap<>();
 
-        public void register(@NotNull final GenericConverter converter) {
+        public void add(@NotNull final GenericConverter converter) {
+            final Set<GenericConverter.ConversionPath> paths = converter.paths();
 
+            if (paths.isEmpty()) {
+                this.globalConverters.add(converter);
+                return;
+            }
+
+            for (final GenericConverter.ConversionPath conversionPath : paths) {
+                this.converters.computeIfAbsent(conversionPath, k -> new ConcurrentLinkedDeque<>()).add(converter);
+            }
         }
 
-        public GenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
+        public GenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
+            final Class<?> erasedSourceType = GenericTypeReflector.erase(sourceType);
+            final Class<?> erasedTargetType = GenericTypeReflector.erase(targetType);
+
+            // Search the full type tree
+            final List<Class<?>> sourceTree = ClassTreeUtil.classTree(erasedSourceType);
+            final List<Class<?>> targetTree = ClassTreeUtil.classTree(erasedTargetType);
+
+            for (final Class<?> targetCandidate : targetTree) {
+                for (final Class<?> sourceCandidate : sourceTree) {
+                    final GenericConverter.ConversionPath path = new GenericConverter.ConversionPath(sourceCandidate, targetCandidate);
+                    final GenericConverter converter = this.converter(sourceType, targetType, path);
+
+                    if (converter != null) {
+                        return converter;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private GenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType,
+            @NotNull final GenericConverter.ConversionPath path
+        ) {
+            // Check specifically registered converters
+            final Deque<GenericConverter> convertersForPath = this.converters.get(path);
+
+            if (convertersForPath != null) {
+                for (final GenericConverter converter : convertersForPath) {
+                    if (!converter.isSuitable(sourceType, targetType)) {
+                        continue;
+                    }
+                    return converter;
+                }
+            }
+
+            // Check ConditionalConverters for a dynamic match
+            for (GenericConverter converter : this.globalConverters) {
+                if (converter.isSuitable(sourceType, targetType)) {
+                    return converter;
+                }
+            }
+
             return null;
         }
     }

@@ -43,6 +43,8 @@ allprojects {
     apply(plugin = "com.diffplug.spotless")
 
     dependencies {
+        "api"(rootProject.libs.geantyref)
+
         "implementation"(rootProject.libs.annotations)
         "implementation"(rootProject.libs.slf4j)
 
