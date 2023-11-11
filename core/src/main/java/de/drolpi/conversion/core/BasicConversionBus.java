@@ -20,14 +20,15 @@ import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.GenericConverter;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
-import de.drolpi.conversion.core.util.ClassTreeUtil;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -167,8 +168,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
             final Class<?> erasedTargetType = GenericTypeReflector.erase(targetType);
 
             // Search the full type tree
-            final List<Class<?>> sourceTree = ClassTreeUtil.classTree(erasedSourceType);
-            final List<Class<?>> targetTree = ClassTreeUtil.classTree(erasedTargetType);
+            final List<Class<?>> sourceTree = this.collectClassTree(erasedSourceType);
+            final List<Class<?>> targetTree = this.collectClassTree(erasedTargetType);
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
@@ -206,6 +207,58 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
 
             return null;
+        }
+
+        private @NotNull List<Class<?>> collectClassTree(@NotNull final Class<?> type) {
+            final List<Class<?>> tree = new ArrayList<>(20);
+            final Set<Class<?>> visited = new HashSet<>(20);
+
+            this.collectClass(0, type, false, tree, visited);
+            final boolean array = type.isArray();
+
+            // Walk through super class tree
+            for (int i = 0; i < tree.size(); i++) {
+                Class<?> candidate = tree.get(i);
+                candidate = (array ? candidate.componentType() : candidate);
+
+                // Collect
+                final Class<?> superclass = candidate.getSuperclass();
+                if (superclass != null && superclass != Object.class && superclass != Enum.class) {
+                    this.collectClass(i + 1, candidate.getSuperclass(), array, tree, visited);
+                }
+                this.collectInterfaces(candidate, array, tree, visited);
+            }
+
+            // Check whether the type is an enum or not
+            if (Enum.class.isAssignableFrom(type)) {
+                this.collectClass(tree.size(), Enum.class, array, tree, visited);
+                this.collectClass(tree.size(), Enum.class, false, tree, visited);
+                this.collectInterfaces(Enum.class, array, tree, visited);
+            }
+
+            // Add object type
+            this.collectClass(tree.size(), Object.class, array, tree, visited);
+            this.collectClass(tree.size(), Object.class, false, tree, visited);
+            return tree;
+        }
+
+        private void collectInterfaces(@NotNull final Class<?> type, final boolean asArray,
+            @NotNull final List<Class<?>> hierarchy, @NotNull final Set<Class<?>> visited
+        ) {
+            for (final Class<?> implementedInterface : type.getInterfaces()) {
+                this.collectClass(hierarchy.size(), implementedInterface, asArray, hierarchy, visited);
+            }
+        }
+
+        private void collectClass(int index, @NotNull Class<?> type, boolean asArray,
+            @NotNull final List<Class<?>> hierarchy, @NotNull final Set<Class<?>> visited
+        ) {
+            if (asArray) {
+                type = type.arrayType();
+            }
+            if (visited.add(type)) {
+                hierarchy.add(index, type);
+            }
         }
     }
 
