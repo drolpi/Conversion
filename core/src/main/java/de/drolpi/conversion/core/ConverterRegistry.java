@@ -17,13 +17,16 @@
 package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
+import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
 
 public interface ConverterRegistry {
 
     <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<? extends U, ? extends V> converter);
 
-    void register(@NotNull GenericConverter converter);
+    void register(@NotNull NonGenericConverter converter);
 
+    void unregister(@NotNull Class<?> source, @NotNull Class<?> target);
+
+    void unregister(@NotNull NonGenericConverter converter);
 }

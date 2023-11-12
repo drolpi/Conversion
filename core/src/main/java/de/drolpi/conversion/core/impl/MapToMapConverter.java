@@ -16,7 +16,7 @@
 
 package de.drolpi.conversion.core.impl;
 
-import de.drolpi.conversion.core.converter.GenericConverter;
+import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public final class MapToMapConverter implements GenericConverter {
+public final class MapToMapConverter implements NonGenericConverter {
 
     @Override
     public @NotNull Set<ConversionPath> paths() {

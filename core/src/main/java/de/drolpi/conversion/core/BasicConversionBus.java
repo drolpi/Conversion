@@ -18,7 +18,7 @@ package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.GenericConverter;
+import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
     private static final NoOpConverter NO_OP_CONVERTER = new NoOpConverter();
 
     private final ConverterRegistrar registrar = new ConverterRegistrar();
-    private final Map<CacheKey, GenericConverter> cache = new ConcurrentHashMap<>(64);
+    private final Map<CacheKey, NonGenericConverter> cache = new ConcurrentHashMap<>(64);
 
     BasicConversionBus() {
 
@@ -57,11 +57,29 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @Override
-    public void register(@NotNull final GenericConverter converter) {
-        // Register in storage
+    public void register(@NotNull final NonGenericConverter converter) {
+        // Register in registrar
         this.registrar.add(converter);
 
         // Invalidate cache because maybe previously not possible conversions are possible now
+        this.invalidateCache();
+    }
+
+    @Override
+    public void unregister(@NotNull Class<?> source, @NotNull Class<?> target) {
+        // Remove from registrar
+        this.registrar.remove(source, target);
+
+        // Invalidate cache because maybe a suitable converter is cached
+        this.invalidateCache();
+    }
+
+    @Override
+    public void unregister(@NotNull NonGenericConverter converter) {
+        // Remove from registrar
+        this.registrar.remove(converter);
+
+        // Invalidate cache because maybe this converter is cached
         this.invalidateCache();
     }
 
@@ -77,11 +95,11 @@ class BasicConversionBus implements ConfigurableConversionBus {
         return converter.convert(source, source.getClass(), targetType);
     }
 
-    private @Nullable GenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
+    private @Nullable NonGenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
         final CacheKey cacheKey = new CacheKey(sourceType, targetType);
 
         // Take a look at the cache to see if this conversion has been done before
-        GenericConverter converter = this.cache.get(cacheKey);
+        NonGenericConverter converter = this.cache.get(cacheKey);
 
         if (converter != null) {
             // Check whether a converter was found in the previous conversion or not
@@ -114,12 +132,12 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @SuppressWarnings("unchecked")
-    private static final class ConverterAdapter implements GenericConverter {
+    private static final class ConverterAdapter implements NonGenericConverter {
 
         private final Converter<Object, Object> converter;
         private final ConversionPath path;
 
-        public ConverterAdapter(final Converter<?, ?> converter, final Class<?> sourceType, final Class<?> targetType) {
+        private ConverterAdapter(final Converter<?, ?> converter, final Class<?> sourceType, final Class<?> targetType) {
             this.converter = (Converter<Object, Object>) converter;
             this.path = new ConversionPath(sourceType, targetType);
         }
@@ -147,31 +165,43 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     private static final class ConverterRegistrar {
 
-        private final Set<GenericConverter> globalConverters = new CopyOnWriteArraySet<>();
-        private final Map<GenericConverter.ConversionPath, Deque<GenericConverter>> converters = new ConcurrentHashMap<>();
+        private final Set<NonGenericConverter> globalConverters = new CopyOnWriteArraySet<>();
+        private final Map<NonGenericConverter.ConversionPath, Deque<NonGenericConverter>> converters = new ConcurrentHashMap<>();
 
-        public void add(@NotNull final GenericConverter converter) {
-            final Set<GenericConverter.ConversionPath> paths = converter.paths();
+        private void add(@NotNull final NonGenericConverter converter) {
+            final Set<NonGenericConverter.ConversionPath> paths = converter.paths();
 
             if (paths.isEmpty()) {
                 this.globalConverters.add(converter);
                 return;
             }
 
-            for (final GenericConverter.ConversionPath conversionPath : paths) {
+            for (final NonGenericConverter.ConversionPath conversionPath : paths) {
                 this.converters.computeIfAbsent(conversionPath, k -> new ConcurrentLinkedDeque<>()).add(converter);
             }
         }
 
-        public GenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
+        private void remove(@NotNull Class<?> source, @NotNull Class<?> target) {
+            this.converters.remove(new NonGenericConverter.ConversionPath(source, target));
+        }
+
+        private void remove(@NotNull NonGenericConverter converter) {
+            this.globalConverters.remove(converter);
+
+            for (final NonGenericConverter.ConversionPath path : converter.paths()) {
+                this.remove(path.sourceType(), path.targetType());
+            }
+        }
+
+        private NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
             // Search the full type tree
             final List<Class<?>> sourceTree = this.collectClassTree(sourceType);
             final List<Class<?>> targetTree = this.collectClassTree(targetType);
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
-                    final GenericConverter.ConversionPath path = new GenericConverter.ConversionPath(sourceCandidate, targetCandidate);
-                    final GenericConverter converter = this.converter(path);
+                    final NonGenericConverter.ConversionPath path = new NonGenericConverter.ConversionPath(sourceCandidate, targetCandidate);
+                    final NonGenericConverter converter = this.converter(path);
 
                     if (converter != null) {
                         return converter;
@@ -181,12 +211,12 @@ class BasicConversionBus implements ConfigurableConversionBus {
             return null;
         }
 
-        private GenericConverter converter(@NotNull final GenericConverter.ConversionPath path) {
+        private NonGenericConverter converter(@NotNull final NonGenericConverter.ConversionPath path) {
             // Check specifically registered converters
-            final Deque<GenericConverter> convertersForPath = this.converters.get(path);
+            final Deque<NonGenericConverter> convertersForPath = this.converters.get(path);
 
             if (convertersForPath != null) {
-                for (final GenericConverter converter : convertersForPath) {
+                for (final NonGenericConverter converter : convertersForPath) {
                     if (!converter.isSuitable(path.sourceType(), path.targetType())) {
                         continue;
                     }
@@ -195,7 +225,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
 
             // Check ConditionalConverters for a dynamic match
-            for (final GenericConverter converter : this.globalConverters) {
+            for (final NonGenericConverter converter : this.globalConverters) {
                 if (converter.isSuitable(path.sourceType(), path.targetType())) {
                     return converter;
                 }
@@ -272,7 +302,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
     }
 
-    private static final class NoOpConverter implements GenericConverter {
+    private static final class NoOpConverter implements NonGenericConverter {
 
         private NoOpConverter() {
 
