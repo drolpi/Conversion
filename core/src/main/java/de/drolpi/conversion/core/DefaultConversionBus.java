@@ -25,6 +25,7 @@ import de.drolpi.conversion.core.impl.NumberToCharacterConverter;
 import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 import de.drolpi.conversion.core.impl.StringToCharacterConverter;
+import de.drolpi.conversion.core.impl.StringToCurrencyConverter;
 
 import java.nio.charset.Charset;
 import java.util.Currency;
@@ -53,6 +54,7 @@ class DefaultConversionBus extends BasicConversionBus {
         this.register(Charset.class, String.class, new ObjectToStringConverter());
 
         this.register(Currency.class, String.class, new ObjectToStringConverter());
+        this.register(String.class, Currency.class, new StringToCurrencyConverter());
 
         this.register(UUID.class, String.class, new ObjectToStringConverter());
 
