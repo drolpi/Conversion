@@ -26,10 +26,12 @@ import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 import de.drolpi.conversion.core.impl.StringToCharacterConverter;
 import de.drolpi.conversion.core.impl.StringToCurrencyConverter;
+import de.drolpi.conversion.core.impl.StringToUriConverter;
 import de.drolpi.conversion.core.impl.StringToUrlConverter;
 import de.drolpi.conversion.core.impl.StringToUuidConverter;
 
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Currency;
@@ -69,6 +71,9 @@ class DefaultConversionBus extends BasicConversionBus {
 
         this.register(URL.class, String.class, new ObjectToStringConverter());
         this.register(String.class, URL.class, new StringToUrlConverter());
+
+        this.register(URI.class, String.class, new ObjectToStringConverter());
+        this.register(String.class, URI.class, new StringToUriConverter());
 
         this.register(Enum.class, String.class, new EnumToStringConverter());
         this.register(Enum.class, Integer.class, new EnumToIntegerConverter());
