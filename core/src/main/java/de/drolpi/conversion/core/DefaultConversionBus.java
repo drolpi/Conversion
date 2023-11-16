@@ -17,15 +17,36 @@
 package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.impl.MapToMapConverter;
+import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
+
+import java.nio.charset.Charset;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 class DefaultConversionBus extends BasicConversionBus {
 
     public DefaultConversionBus() {
-        //Scalar converters
+        // Scalar converters
+
+        this.register(Boolean.class, String.class, new ObjectToStringConverter());
         this.register(String.class, Boolean.class, new StringToBooleanConverter());
 
-        //Collection converters
+        this.register(Number.class, String.class, new ObjectToStringConverter());
+
+        this.register(Locale.class, String.class, new ObjectToStringConverter());
+
+        this.register(Charset.class, String.class, new ObjectToStringConverter());
+
+        this.register(Currency.class, String.class, new ObjectToStringConverter());
+
+        this.register(UUID.class, String.class, new ObjectToStringConverter());
+
+        this.register(Pattern.class, String.class, new ObjectToStringConverter());
+
+        // Collection converters
         this.register(new MapToMapConverter());
     }
 }
