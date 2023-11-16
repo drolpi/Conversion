@@ -19,6 +19,7 @@ package de.drolpi.conversion.core;
 import de.drolpi.conversion.core.impl.EnumToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToStringConverter;
 import de.drolpi.conversion.core.impl.MapToMapConverter;
+import de.drolpi.conversion.core.impl.NumberToCharacterConverter;
 import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 
@@ -50,6 +51,8 @@ class DefaultConversionBus extends BasicConversionBus {
 
         this.register(Enum.class, String.class, new EnumToStringConverter());
         this.register(Enum.class, Integer.class, new EnumToIntegerConverter());
+
+        this.register(Number.class, Character.class, new NumberToCharacterConverter());
 
         // Collection converters
         this.register(new MapToMapConverter());
