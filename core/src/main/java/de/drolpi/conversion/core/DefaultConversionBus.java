@@ -22,6 +22,7 @@ import de.drolpi.conversion.core.impl.MapToMapConverter;
 import de.drolpi.conversion.core.impl.NumberToCharacterConverter;
 import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
+import de.drolpi.conversion.core.impl.StringToCharacterConverter;
 
 import java.nio.charset.Charset;
 import java.util.Currency;
@@ -36,6 +37,9 @@ class DefaultConversionBus extends BasicConversionBus {
 
         this.register(Boolean.class, String.class, new ObjectToStringConverter());
         this.register(String.class, Boolean.class, new StringToBooleanConverter());
+
+        this.register(Character.class, String.class, new ObjectToStringConverter());
+        this.register(String.class, Character.class, new StringToCharacterConverter());
 
         this.register(Number.class, String.class, new ObjectToStringConverter());
 
