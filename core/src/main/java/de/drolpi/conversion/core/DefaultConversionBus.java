@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.core;
 
+import de.drolpi.conversion.core.impl.BooleanToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToStringConverter;
 import de.drolpi.conversion.core.impl.MapToMapConverter;
@@ -37,9 +38,11 @@ class DefaultConversionBus extends BasicConversionBus {
 
         this.register(Boolean.class, String.class, new ObjectToStringConverter());
         this.register(String.class, Boolean.class, new StringToBooleanConverter());
+        this.register(Boolean.class, Integer.class, new BooleanToIntegerConverter());
 
         this.register(Character.class, String.class, new ObjectToStringConverter());
         this.register(String.class, Character.class, new StringToCharacterConverter());
+        this.register(Number.class, Character.class, new NumberToCharacterConverter());
 
         this.register(Number.class, String.class, new ObjectToStringConverter());
 
@@ -55,8 +58,6 @@ class DefaultConversionBus extends BasicConversionBus {
 
         this.register(Enum.class, String.class, new EnumToStringConverter());
         this.register(Enum.class, Integer.class, new EnumToIntegerConverter());
-
-        this.register(Number.class, Character.class, new NumberToCharacterConverter());
 
         // Collection converters
         this.register(new MapToMapConverter());
