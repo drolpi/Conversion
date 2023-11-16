@@ -26,8 +26,11 @@ import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 import de.drolpi.conversion.core.impl.StringToCharacterConverter;
 import de.drolpi.conversion.core.impl.StringToCurrencyConverter;
+import de.drolpi.conversion.core.impl.StringToUrlConverter;
 import de.drolpi.conversion.core.impl.StringToUuidConverter;
 
+import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Currency;
 import java.util.Locale;
@@ -48,11 +51,11 @@ class DefaultConversionBus extends BasicConversionBus {
         this.register(String.class, Character.class, new StringToCharacterConverter());
         this.register(Number.class, Character.class, new NumberToCharacterConverter());
 
-        this.register(Number.class, String.class, new ObjectToStringConverter());
-
-        this.register(Locale.class, String.class, new ObjectToStringConverter());
-
         this.register(Charset.class, String.class, new ObjectToStringConverter());
+        this.register(CharSequence.class, String.class, new ObjectToStringConverter());
+        this.register(StringWriter.class, String.class, new ObjectToStringConverter());
+
+        this.register(Number.class, String.class, new ObjectToStringConverter());
 
         this.register(Currency.class, String.class, new ObjectToStringConverter());
         this.register(String.class, Currency.class, new StringToCurrencyConverter());
@@ -61,6 +64,11 @@ class DefaultConversionBus extends BasicConversionBus {
         this.register(String.class, UUID.class, new StringToUuidConverter());
 
         this.register(Pattern.class, String.class, new ObjectToStringConverter());
+
+        this.register(Locale.class, String.class, new ObjectToStringConverter());
+
+        this.register(URL.class, String.class, new ObjectToStringConverter());
+        this.register(String.class, URL.class, new StringToUrlConverter());
 
         this.register(Enum.class, String.class, new EnumToStringConverter());
         this.register(Enum.class, Integer.class, new EnumToIntegerConverter());
