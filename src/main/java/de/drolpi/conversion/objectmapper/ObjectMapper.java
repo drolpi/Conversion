@@ -14,20 +14,35 @@
  * limitations under the License.
  */
 
-enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-enableFeaturePreview("VERSION_CATALOGS")
+package de.drolpi.conversion.objectmapper;
 
-pluginManagement {
-    includeBuild("build-logic")
-    repositories {
-        gradlePluginPortal()
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Type;
+import java.util.Map;
+
+public interface ObjectMapper<T> {
+
+    static @NotNull Factory factory() {
+        return null;
+    }
+
+    static @NotNull Factory.Builder factoryBuilder() {
+        return null;
+    }
+
+    T load(Map<String, Object> source);
+
+    Map<String, Object> save(T source);
+
+    interface Factory {
+
+        @NotNull ObjectMapper<?> get(@NotNull Type type);
+
+        interface Builder {
+
+            @NotNull ObjectMapper.Factory build();
+
+        }
     }
 }
-
-rootProject.name = "Conversion"
-
-include(
-        ":core",
-        ":object-mapper"
-)
