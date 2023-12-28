@@ -31,6 +31,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -84,7 +85,15 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @Override
-    public @NotNull Object convert(@NotNull final Object source, @NotNull final Type targetType) {
+    public Object convert(final Object source, @NotNull final Type targetType) {
+        if (source == null) {
+            if (targetType == Optional.class) {
+                return Optional.empty();
+            }
+
+            return null;
+        }
+
         final Converter<Object, Object> converter = this.converter(source.getClass(), targetType);
 
         if (converter == null) {

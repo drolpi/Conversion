@@ -30,11 +30,10 @@ public interface ConversionBus {
         return new DefaultConversionBus();
     }
 
-    @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
+    Object convert(Object source, @NotNull Type targetType);
 
     @SuppressWarnings("unchecked")
-    default <T> T convert(@NotNull Object source, @NotNull Class<T> targetType) {
+    default <T> T convert(Object source, @NotNull Class<T> targetType) {
         return (T) this.convert(source, (Type) targetType);
     }
-
 }
