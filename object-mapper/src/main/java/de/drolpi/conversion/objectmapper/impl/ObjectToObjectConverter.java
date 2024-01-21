@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 Lars Nippert
+ * Copyright 2023-2024 Lars Nippert
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,31 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core.impl;
+package de.drolpi.conversion.objectmapper.impl;
 
 import de.drolpi.conversion.core.converter.NonGenericConverter;
+import de.drolpi.conversion.objectmapper.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
 
-public final class EnumToStringConverter implements NonGenericConverter {
+public class ObjectToObjectConverter extends AbstractObjectMappingConverter implements NonGenericConverter {
 
+    public ObjectToObjectConverter(ObjectMapper.Factory factory) {
+        super(factory);
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-    public @Nullable Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if(!(source instanceof Enum<?> enumSource)) {
-            return null;
-        }
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        final ObjectMapper<Object> sourceMapper = (ObjectMapper<Object>) this.factory.get(sourceType);
+        final ObjectMapper<Object> targetMapper = (ObjectMapper<Object>) this.factory.get(targetType);
 
-        return enumSource.name();
+        final Map<String, Object> map = sourceMapper.save(source);
+        return targetMapper.load(map);
     }
 
     @Override
@@ -42,7 +49,7 @@ public final class EnumToStringConverter implements NonGenericConverter {
     @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
-            new ConversionPath(Enum.class, String.class)
+            new ConversionPath(Object.class, Object.class)
         );
     }
 }

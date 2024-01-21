@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.core;
 
+import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -30,6 +31,14 @@ public interface ConversionBus {
         return new DefaultConversionBus();
     }
 
+    static @NotNull ConfigurableConversionBus createAlgorithm() {
+        return new AlgorithmConversionBus();
+    }
+
+    static @NotNull ConfigurableConversionBus createAlgorithmDefault() {
+        return new DefaultAlgorithmConversionBus();
+    }
+
     @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
 
     @SuppressWarnings("unchecked")
@@ -37,4 +46,8 @@ public interface ConversionBus {
         return (T) this.convert(source, (Type) targetType);
     }
 
+    @SuppressWarnings("unchecked")
+    default <T> T convert(@NotNull Object source, @NotNull TypeToken<T> typeToken) {
+        return (T) this.convert(source, typeToken.getType());
+    }
 }

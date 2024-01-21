@@ -16,15 +16,33 @@
 
 package de.drolpi.conversion.core.impl;
 
-import de.drolpi.conversion.core.converter.Converter;
+import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.Set;
 
-public final class EnumToIntegerConverter implements Converter<Enum<?>, Integer> {
+public final class EnumToIntegerConverter implements NonGenericConverter {
 
     @Override
-    public @NotNull Integer convert(@NotNull Enum<?> source, @NotNull Type sourceType, @NotNull Type targetType) {
-        return source.ordinal();
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (!(source instanceof Enum<?> enumSource)) {
+            return null;
+        }
+
+        return enumSource.ordinal();
+    }
+
+    @Override
+    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        return true;
+    }
+
+    @Override
+    public @NotNull Set<ConversionPath> paths() {
+        return Set.of(
+            new ConversionPath(Enum.class, Integer.class)
+        );
     }
 }

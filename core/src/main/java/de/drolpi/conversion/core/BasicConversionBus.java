@@ -19,7 +19,9 @@ package de.drolpi.conversion.core;
 import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
+import de.drolpi.conversion.core.exception.ConversionFailedException;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
+import de.drolpi.conversion.core.util.ClassCollectorUtil;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +29,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,16 +43,20 @@ class BasicConversionBus implements ConfigurableConversionBus {
     private static final NoOpConverter NO_MATCH_CONVERTER = new NoOpConverter();
     private static final NoOpConverter NO_OP_CONVERTER = new NoOpConverter();
 
-    private final ConverterRegistrar registrar = new ConverterRegistrar();
+    private final ConverterRegistrar registrar;
     private final Map<CacheKey, NonGenericConverter> cache = new ConcurrentHashMap<>(64);
 
     BasicConversionBus() {
+        this.registrar = new ConverterRegistrar();
+    }
 
+    public BasicConversionBus(ConverterRegistrar registrar) {
+        this.registrar = registrar;
     }
 
     @Override
     public <U, V> void register(@NotNull final Class<? extends U> sourceType, final @NotNull Class<V> targetType,
-        @NotNull final Converter<? extends U, ? extends V> converter
+        @NotNull final Converter<U, V> converter
     ) {
         // Register via adapter (GenericConverter)
         this.register(new ConverterAdapter(converter, sourceType, targetType));
@@ -85,14 +91,19 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     @Override
     public @NotNull Object convert(@NotNull final Object source, @NotNull final Type targetType) {
-        final Converter<Object, Object> converter = this.converter(source.getClass(), targetType);
+        final Class<?> sourceType = source.getClass();
+        final Type boxedSourceType = GenericTypeReflector.box(sourceType);
+        final Type boxedTargetType = GenericTypeReflector.box(targetType);
+
+        final Converter<Object, Object> converter = this.converter(boxedSourceType, boxedTargetType);
 
         if (converter == null) {
             // No Converter found
-            throw new ConverterNotFoundException(source.getClass(), targetType);
+            throw new ConverterNotFoundException(boxedSourceType, boxedTargetType);
         }
 
-        return converter.convert(source, source.getClass(), targetType);
+        //TODO:
+        return converter.convert(source, boxedSourceType, boxedTargetType);
     }
 
     private @Nullable NonGenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
@@ -158,15 +169,15 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         @Override
-        public @NotNull Object convert(@NotNull final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+        public @Nullable Object convert(@Nullable final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
             return this.converter.convert(source, sourceType, targetType);
         }
     }
 
-    private static final class ConverterRegistrar {
+    protected static class ConverterRegistrar {
 
         private final Set<NonGenericConverter> globalConverters = new CopyOnWriteArraySet<>();
-        private final Map<NonGenericConverter.ConversionPath, Deque<NonGenericConverter>> converters = new ConcurrentHashMap<>();
+        protected final Map<NonGenericConverter.ConversionPath, Deque<NonGenericConverter>> converters = new ConcurrentHashMap<>();
 
         private void add(@NotNull final NonGenericConverter converter) {
             final Set<NonGenericConverter.ConversionPath> paths = converter.paths();
@@ -193,10 +204,10 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
         }
 
-        private NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
+        protected NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
             // Search the full type tree
-            final List<Class<?>> sourceTree = this.collectClassTree(sourceType);
-            final List<Class<?>> targetTree = this.collectClassTree(targetType);
+            final List<Class<?>> sourceTree = ClassCollectorUtil.classTree(sourceType);
+            final List<Class<?>> targetTree = ClassCollectorUtil.classTree(targetType);
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
@@ -208,6 +219,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
                     }
                 }
             }
+
             return null;
         }
 
@@ -232,59 +244,6 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
 
             return null;
-        }
-
-        private @NotNull List<Class<?>> collectClassTree(@NotNull final Type type) {
-            final Class<?> erasedType = GenericTypeReflector.erase(GenericTypeReflector.box(type));
-            final List<Class<?>> tree = new ArrayList<>(20);
-            final Set<Class<?>> visited = new HashSet<>(20);
-
-            this.collectClass(0, erasedType, false, tree, visited);
-            final boolean array = erasedType.isArray();
-
-            // Walk through super class tree
-            for (int i = 0; i < tree.size(); i++) {
-                Class<?> candidate = tree.get(i);
-                candidate = (array ? candidate.componentType() : candidate);
-
-                // Collect
-                final Class<?> superclass = candidate.getSuperclass();
-                if (superclass != null && superclass != Object.class && superclass != Enum.class) {
-                    this.collectClass(i + 1, candidate.getSuperclass(), array, tree, visited);
-                }
-                this.collectInterfaces(candidate, array, tree, visited);
-            }
-
-            // Check whether the type is an enum or not
-            if (Enum.class.isAssignableFrom(erasedType)) {
-                this.collectClass(tree.size(), Enum.class, array, tree, visited);
-                this.collectClass(tree.size(), Enum.class, false, tree, visited);
-                this.collectInterfaces(Enum.class, array, tree, visited);
-            }
-
-            // Add object type
-            this.collectClass(tree.size(), Object.class, array, tree, visited);
-            this.collectClass(tree.size(), Object.class, false, tree, visited);
-            return tree;
-        }
-
-        private void collectInterfaces(@NotNull final Class<?> type, final boolean asArray,
-            @NotNull final List<Class<?>> hierarchy, @NotNull final Set<Class<?>> visited
-        ) {
-            for (final Class<?> implementedInterface : type.getInterfaces()) {
-                this.collectClass(hierarchy.size(), implementedInterface, asArray, hierarchy, visited);
-            }
-        }
-
-        private void collectClass(int index, @NotNull Class<?> type, boolean asArray,
-            @NotNull final List<Class<?>> hierarchy, @NotNull final Set<Class<?>> visited
-        ) {
-            if (asArray) {
-                type = type.arrayType();
-            }
-            if (visited.add(type)) {
-                hierarchy.add(index, type);
-            }
         }
     }
 
@@ -319,7 +278,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         @Override
-        public @NotNull Object convert(@NotNull final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+        public Object convert(final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
             return source;
         }
     }

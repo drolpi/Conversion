@@ -2,7 +2,7 @@
  * Copyright 2023-2023 Lars Nippert
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use bus file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -20,12 +20,15 @@ import de.drolpi.conversion.core.impl.BooleanToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToStringConverter;
 import de.drolpi.conversion.core.impl.IntegerToBooleanConverter;
+import de.drolpi.conversion.core.impl.IntegerToEnumConverter;
 import de.drolpi.conversion.core.impl.MapToMapConverter;
 import de.drolpi.conversion.core.impl.NumberToCharacterConverter;
+import de.drolpi.conversion.core.impl.NumberToNumberConverter;
 import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 import de.drolpi.conversion.core.impl.StringToCharacterConverter;
 import de.drolpi.conversion.core.impl.StringToCurrencyConverter;
+import de.drolpi.conversion.core.impl.StringToEnumConverter;
 import de.drolpi.conversion.core.impl.StringToUriConverter;
 import de.drolpi.conversion.core.impl.StringToUrlConverter;
 import de.drolpi.conversion.core.impl.StringToUuidConverter;
@@ -42,43 +45,49 @@ import java.util.regex.Pattern;
 class DefaultConversionBus extends BasicConversionBus {
 
     public DefaultConversionBus() {
+        DefaultConversionBus.registerDefaults(this);
+    }
+    
+    public static void registerDefaults(ConfigurableConversionBus bus) {
         // Scalar converters
+        bus.register(Boolean.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, Boolean.class, new StringToBooleanConverter());
+        bus.register(Boolean.class, Integer.class, new BooleanToIntegerConverter());
+        bus.register(Integer.class, Boolean.class, new IntegerToBooleanConverter());
 
-        this.register(Boolean.class, String.class, new ObjectToStringConverter());
-        this.register(String.class, Boolean.class, new StringToBooleanConverter());
-        this.register(Boolean.class, Integer.class, new BooleanToIntegerConverter());
-        this.register(Integer.class, Boolean.class, new IntegerToBooleanConverter());
+        bus.register(Character.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, Character.class, new StringToCharacterConverter());
+        bus.register(Number.class, Character.class, new NumberToCharacterConverter());
 
-        this.register(Character.class, String.class, new ObjectToStringConverter());
-        this.register(String.class, Character.class, new StringToCharacterConverter());
-        this.register(Number.class, Character.class, new NumberToCharacterConverter());
+        bus.register(Charset.class, String.class, new ObjectToStringConverter());
+        bus.register(CharSequence.class, String.class, new ObjectToStringConverter());
+        bus.register(StringWriter.class, String.class, new ObjectToStringConverter());
 
-        this.register(Charset.class, String.class, new ObjectToStringConverter());
-        this.register(CharSequence.class, String.class, new ObjectToStringConverter());
-        this.register(StringWriter.class, String.class, new ObjectToStringConverter());
+        bus.register(Number.class, String.class, new ObjectToStringConverter());
+        bus.register(Number.class, Number.class, new NumberToNumberConverter());
 
-        this.register(Number.class, String.class, new ObjectToStringConverter());
+        bus.register(Currency.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, Currency.class, new StringToCurrencyConverter());
 
-        this.register(Currency.class, String.class, new ObjectToStringConverter());
-        this.register(String.class, Currency.class, new StringToCurrencyConverter());
+        bus.register(UUID.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, UUID.class, new StringToUuidConverter());
 
-        this.register(UUID.class, String.class, new ObjectToStringConverter());
-        this.register(String.class, UUID.class, new StringToUuidConverter());
+        bus.register(Pattern.class, String.class, new ObjectToStringConverter());
 
-        this.register(Pattern.class, String.class, new ObjectToStringConverter());
+        bus.register(Locale.class, String.class, new ObjectToStringConverter());
 
-        this.register(Locale.class, String.class, new ObjectToStringConverter());
+        bus.register(URL.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, URL.class, new StringToUrlConverter());
 
-        this.register(URL.class, String.class, new ObjectToStringConverter());
-        this.register(String.class, URL.class, new StringToUrlConverter());
+        bus.register(URI.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, URI.class, new StringToUriConverter());
 
-        this.register(URI.class, String.class, new ObjectToStringConverter());
-        this.register(String.class, URI.class, new StringToUriConverter());
-
-        this.register(Enum.class, String.class, new EnumToStringConverter());
-        this.register(Enum.class, Integer.class, new EnumToIntegerConverter());
+        bus.register(new EnumToStringConverter());
+        bus.register(new StringToEnumConverter());
+        bus.register(new EnumToIntegerConverter());
+        bus.register(new IntegerToEnumConverter());
 
         // Collection converters
-        this.register(new MapToMapConverter());
+        bus.register(new MapToMapConverter());
     }
 }

@@ -27,7 +27,7 @@ public class ConversionFailedException extends ConversionException {
 
     private final Object source;
 
-    public ConversionFailedException(@NotNull Type sourceType, @NotNull Type targetType, @NotNull Object source) {
+    public ConversionFailedException(@NotNull Type sourceType, @NotNull Type targetType, Object source) {
         super(sourceType, targetType, String.format("Failed to convert from type [%s] to type [%s] for value [%s]", sourceType, targetType, source));
         this.source = source;
     }

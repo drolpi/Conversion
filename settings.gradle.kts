@@ -28,5 +28,6 @@ pluginManagement {
 rootProject.name = "Conversion"
 
 include(
-        ":core"
+        ":core",
+        ":object-mapper"
 )

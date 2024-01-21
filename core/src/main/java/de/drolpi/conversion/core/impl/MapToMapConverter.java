@@ -18,6 +18,7 @@ package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -37,7 +38,7 @@ public final class MapToMapConverter implements NonGenericConverter {
     }
 
     @Override
-    public @NotNull Object convert(@NotNull Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
         return null;
     }
 }
