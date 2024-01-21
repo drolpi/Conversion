@@ -16,7 +16,10 @@
 
 package de.drolpi.conversion.core;
 
+import de.drolpi.conversion.core.impl.ArrayToArrayConverter;
 import de.drolpi.conversion.core.impl.BooleanToIntegerConverter;
+import de.drolpi.conversion.core.impl.CharacterToNumberConverter;
+import de.drolpi.conversion.core.impl.CollectionToCollectionConverter;
 import de.drolpi.conversion.core.impl.EnumToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToStringConverter;
 import de.drolpi.conversion.core.impl.IntegerToBooleanConverter;
@@ -24,11 +27,14 @@ import de.drolpi.conversion.core.impl.IntegerToEnumConverter;
 import de.drolpi.conversion.core.impl.MapToMapConverter;
 import de.drolpi.conversion.core.impl.NumberToCharacterConverter;
 import de.drolpi.conversion.core.impl.NumberToNumberConverter;
+import de.drolpi.conversion.core.impl.ObjectToOptionalConverter;
 import de.drolpi.conversion.core.impl.ObjectToStringConverter;
+import de.drolpi.conversion.core.impl.OptionalToObjectConverter;
 import de.drolpi.conversion.core.impl.StringToBooleanConverter;
 import de.drolpi.conversion.core.impl.StringToCharacterConverter;
 import de.drolpi.conversion.core.impl.StringToCurrencyConverter;
 import de.drolpi.conversion.core.impl.StringToEnumConverter;
+import de.drolpi.conversion.core.impl.StringToNumberConverter;
 import de.drolpi.conversion.core.impl.StringToUriConverter;
 import de.drolpi.conversion.core.impl.StringToUrlConverter;
 import de.drolpi.conversion.core.impl.StringToUuidConverter;
@@ -57,6 +63,7 @@ class DefaultConversionBus extends BasicConversionBus {
 
         bus.register(Character.class, String.class, new ObjectToStringConverter());
         bus.register(String.class, Character.class, new StringToCharacterConverter());
+        bus.register(Character.class, Number.class, new CharacterToNumberConverter());
         bus.register(Number.class, Character.class, new NumberToCharacterConverter());
 
         bus.register(Charset.class, String.class, new ObjectToStringConverter());
@@ -64,6 +71,7 @@ class DefaultConversionBus extends BasicConversionBus {
         bus.register(StringWriter.class, String.class, new ObjectToStringConverter());
 
         bus.register(Number.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, Number.class, new StringToNumberConverter());
         bus.register(Number.class, Number.class, new NumberToNumberConverter());
 
         bus.register(Currency.class, String.class, new ObjectToStringConverter());
@@ -87,7 +95,12 @@ class DefaultConversionBus extends BasicConversionBus {
         bus.register(new EnumToIntegerConverter());
         bus.register(new IntegerToEnumConverter());
 
+        bus.register(new ObjectToOptionalConverter(bus));
+        bus.register(new OptionalToObjectConverter(bus));
+
         // Collection converters
-        bus.register(new MapToMapConverter());
+        bus.register(new MapToMapConverter(bus));
+        bus.register(new CollectionToCollectionConverter(bus));
+        bus.register(new ArrayToArrayConverter(bus));
     }
 }

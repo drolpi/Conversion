@@ -90,7 +90,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @Override
-    public @NotNull Object convert(@NotNull final Object source, @NotNull final Type targetType) {
+    public Object convert(@NotNull final Object source, @NotNull final Type targetType) {
         final Class<?> sourceType = source.getClass();
         final Type boxedSourceType = GenericTypeReflector.box(sourceType);
         final Type boxedTargetType = GenericTypeReflector.box(targetType);

@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class NumberToNumberConverter implements Converter<Number, Number> {
+public final class NumberToNumberConverter implements Converter<Number, Number> {
 
     private static final BigInteger LONG_MIN = BigInteger.valueOf(Long.MIN_VALUE);
     private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);

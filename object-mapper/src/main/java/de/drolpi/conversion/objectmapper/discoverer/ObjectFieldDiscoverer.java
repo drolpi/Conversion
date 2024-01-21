@@ -34,14 +34,12 @@ import java.util.function.Supplier;
 @SuppressWarnings("ClassCanBeRecord")
 public class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>> {
 
-    static final ObjectFieldDiscoverer EMPTY_CONSTRUCTOR_INSTANCE = new ObjectFieldDiscoverer(new EmptyConstructorFactory(), false);
+    static final ObjectFieldDiscoverer EMPTY_CONSTRUCTOR_INSTANCE = new ObjectFieldDiscoverer(new EmptyConstructorFactory());
 
     private final Function<Type, Supplier<Object>> instanceFactory;
-    private final boolean requiresInstanceCreation;
 
-    ObjectFieldDiscoverer(Function<Type, Supplier<Object>> instanceFactory, boolean requiresInstanceCreation) {
+    ObjectFieldDiscoverer(Function<Type, Supplier<Object>> instanceFactory) {
         this.instanceFactory = instanceFactory;
-        this.requiresInstanceCreation = requiresInstanceCreation;
     }
 
     @Override
@@ -75,11 +73,8 @@ public class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>
     }
 
     @Override
-    public DataApplier<Map<Field, Object>> createDataApplier(@NotNull Type type) {
+    public @NotNull DataApplier<Map<Field, Object>> createDataApplier(@NotNull Type type) {
         final Supplier<Object> maker = this.instanceFactory.apply(type);
-        if (maker == null && this.requiresInstanceCreation) {
-            throw new RuntimeException();
-        }
 
         return new DataApplier<>() {
             @Override

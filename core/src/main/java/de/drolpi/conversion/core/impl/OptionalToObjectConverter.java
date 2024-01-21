@@ -16,46 +16,50 @@
 
 package de.drolpi.conversion.core.impl;
 
+import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
-import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.Set;
 
-public final class StringToEnumConverter implements NonGenericConverter {
+@SuppressWarnings("ClassCanBeRecord")
+public final class OptionalToObjectConverter implements NonGenericConverter {
 
-    private final IntegerToEnumConverter helpConverter = new IntegerToEnumConverter();
+    private final ConversionBus conversionBus;
+
+    public OptionalToObjectConverter(ConversionBus conversionBus) {
+        this.conversionBus = conversionBus;
+    }
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        //TODO:
         return true;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     @Override
-    public Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        final String identifier = (String) source;
-
-        try {
-            int id = Integer.parseInt(identifier);
-            return this.helpConverter.convert(id, int.class, targetType);
-        } catch (NumberFormatException ignored) {
-
-        }
-
-        if (identifier.isEmpty()) {
-            // It's an empty enum identifier: reset the enum value to null.
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
             return null;
         }
-        final Class<? extends Enum> enumType = (Class<? extends Enum>) GenericTypeReflector.erase(targetType);
-        return Enum.valueOf(enumType, identifier.trim());
+
+        final Optional<Object> optional = (Optional<Object>) source;
+
+        if (optional.isEmpty()) {
+            return null;
+        }
+
+        return this.conversionBus.convert(optional.get(), targetType);
     }
 
     @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
-            new ConversionPath(String.class, Enum.class)
+            new ConversionPath(Optional.class, Object.class)
         );
     }
 }

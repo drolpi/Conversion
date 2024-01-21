@@ -23,6 +23,8 @@ import java.lang.reflect.Type;
 
 public interface ConversionBus {
 
+    //TODO: Enable null sources
+
     static @NotNull ConfigurableConversionBus create() {
         return new BasicConversionBus();
     }
@@ -39,7 +41,7 @@ public interface ConversionBus {
         return new DefaultAlgorithmConversionBus();
     }
 
-    @NotNull Object convert(@NotNull Object source, @NotNull Type targetType);
+    Object convert(@NotNull Object source, @NotNull Type targetType);
 
     @SuppressWarnings("unchecked")
     default <T> T convert(@NotNull Object source, @NotNull Class<T> targetType) {

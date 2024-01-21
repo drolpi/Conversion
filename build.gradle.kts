@@ -46,7 +46,6 @@ allprojects {
         "api"(rootProject.libs.geantyref)
 
         "implementation"(rootProject.libs.annotations)
-        "implementation"(rootProject.libs.slf4j)
 
         "testImplementation"(rootProject.libs.bundles.junit)
         "testImplementation"(rootProject.libs.bundles.mockito)

@@ -61,7 +61,7 @@ public class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
     }
 
     @Override
-    public DataApplier<Object[]> createDataApplier(@NotNull Type type) {
+    public @NotNull DataApplier<Object[]> createDataApplier(@NotNull Type type) {
         final Class<?> clazz = GenericTypeReflector.erase(type);
         final RecordComponent[] recordComponents = clazz.getRecordComponents();
         final Class<?>[] constructorParams = new Class<?>[recordComponents.length];

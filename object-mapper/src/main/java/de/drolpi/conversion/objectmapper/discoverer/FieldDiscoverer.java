@@ -31,14 +31,14 @@ public interface FieldDiscoverer<T> {
     }
 
     static @NotNull FieldDiscoverer<?> create(@NotNull Function<Type, Supplier<Object>> instanceFactory) {
-        return new ObjectFieldDiscoverer(instanceFactory, true);
+        return new ObjectFieldDiscoverer(instanceFactory);
     }
 
     boolean isSuitable(@NotNull Type type);
 
     <U> void discoverFields(@NotNull Type type, List<FieldData<U, T>> fields);
 
-    DataApplier<T> createDataApplier(@NotNull Type type);
+    @NotNull DataApplier<T> createDataApplier(@NotNull Type type);
 
     interface DataApplier<T> {
 
@@ -47,10 +47,6 @@ public interface FieldDiscoverer<T> {
         void complete(Object value, T intermediate);
 
         Object complete(T intermediate);
-
-    }
-
-    record Result<T, U>(List<FieldData<T, U>> fieldData, DataApplier<U> dataApplier) {
 
     }
 

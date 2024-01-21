@@ -41,7 +41,7 @@ public interface NonGenericConverter extends ConditionalConverter<Object, Object
                 return false;
             }
 
-            return (this.sourceType == otherPath.sourceType && this.targetType == otherPath.targetType);
+            return (this.sourceType.equals(otherPath.sourceType) && this.targetType.equals(otherPath.targetType));
         }
     }
 }
