@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 Lars Nippert
+ * Copyright 2023-2024 Lars Nippert
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,43 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core.impl;
+package de.drolpi.conversion.objectmapper.impl;
 
 import de.drolpi.conversion.core.converter.NonGenericConverter;
+import de.drolpi.conversion.objectmapper.ObjectMapper;
+import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
 
-public final class EnumToStringConverter implements NonGenericConverter {
+public class MapToObjectConverter extends AbstractObjectMappingConverter implements NonGenericConverter {
 
+    public MapToObjectConverter(ObjectMapper.Factory factory) {
+        super(factory);
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-    public @Nullable Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if(!(source instanceof Enum<?> enumSource)) {
-            return null;
-        }
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        final Map<String, Object> sourceMap = (Map<String, Object>) source;
+        final ObjectMapper<Object> objectMapper = (ObjectMapper<Object>) this.factory.get(targetType);
 
-        return enumSource.name();
+        return objectMapper.load(sourceMap);
     }
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return true;
+        return this.isMapSuitable(sourceType);
     }
 
     @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
-            new ConversionPath(Enum.class, String.class)
+            new ConversionPath(Map.class, Object.class)
         );
     }
 }

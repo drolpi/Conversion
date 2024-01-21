@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 Lars Nippert
+ * Copyright 2023-2024 Lars Nippert
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,10 @@
 
 package de.drolpi.conversion.core;
 
-import de.drolpi.conversion.core.converter.Converter;
-import de.drolpi.conversion.core.converter.NonGenericConverter;
-import org.jetbrains.annotations.NotNull;
+public class ObjectMappingAlgorithmConversionBus extends DefaultAlgorithmConversionBus implements ObjectMappingConversionBus {
 
-public interface ConverterRegistry {
-
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
-
-    void register(@NotNull NonGenericConverter converter);
-
-    void unregister(@NotNull Class<?> source, @NotNull Class<?> target);
-
-    void unregister(@NotNull NonGenericConverter converter);
+    public ObjectMappingAlgorithmConversionBus() {
+        super();
+        DefaultObjectMappingConversionBus.registerDefaults(this);
+    }
 }

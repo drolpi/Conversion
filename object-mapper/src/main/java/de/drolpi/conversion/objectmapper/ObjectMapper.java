@@ -16,6 +16,8 @@
 
 package de.drolpi.conversion.objectmapper;
 
+import de.drolpi.conversion.core.ConversionBus;
+import de.drolpi.conversion.objectmapper.discoverer.FieldDiscoverer;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -24,11 +26,11 @@ import java.util.Map;
 public interface ObjectMapper<T> {
 
     static @NotNull Factory factory() {
-        return null;
+        return ObjectMapperFactoryImpl.INSTANCE;
     }
 
     static @NotNull Factory.Builder factoryBuilder() {
-        return null;
+        return new ObjectMapperFactoryImpl.BuilderImpl();
     }
 
     T load(Map<String, Object> source);
@@ -37,9 +39,18 @@ public interface ObjectMapper<T> {
 
     interface Factory {
 
+        @SuppressWarnings("unchecked")
+        default @NotNull <T> ObjectMapper<T> get(@NotNull Class<T> type) {
+            return (ObjectMapper<T>) this.get((Type) type);
+        }
+
         @NotNull ObjectMapper<?> get(@NotNull Type type);
 
         interface Builder {
+
+            @NotNull Builder addDiscoverer(@NotNull FieldDiscoverer<?> discoverer);
+
+            @NotNull Builder conversionBus(@NotNull ConversionBus conversionBus);
 
             @NotNull ObjectMapper.Factory build();
 

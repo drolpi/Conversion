@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 Lars Nippert
+ * Copyright 2023-2024 Lars Nippert
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,32 +17,37 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.converter.NonGenericConverter;
+import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Set;
 
-public final class EnumToStringConverter implements NonGenericConverter {
-
-    @Override
-    public @Nullable Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if(!(source instanceof Enum<?> enumSource)) {
-            return null;
-        }
-
-        return enumSource.name();
-    }
+public class IntegerToEnumConverter implements NonGenericConverter {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return true;
+        return false;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
+        final Integer identifier = (Integer) source;
+        final Class<? extends Enum> enumType = (Class<? extends Enum>) GenericTypeReflector.erase(targetType);
+
+        return enumType.getEnumConstants()[identifier];
     }
 
     @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
-            new ConversionPath(Enum.class, String.class)
+            new ConversionPath(Integer.class, Enum.class)
         );
     }
 }

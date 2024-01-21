@@ -17,10 +17,15 @@
 package de.drolpi.conversion.core.converter;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
 import java.util.Set;
 
 public interface NonGenericConverter extends ConditionalConverter<Object, Object> {
+
+    @Override
+    @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType);
 
     @NotNull Set<ConversionPath> paths();
 
