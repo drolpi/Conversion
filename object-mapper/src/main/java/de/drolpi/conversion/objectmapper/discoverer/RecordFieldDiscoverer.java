@@ -26,7 +26,9 @@ import java.lang.reflect.RecordComponent;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
+final class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
+
+    static final RecordFieldDiscoverer INSTANCE = new RecordFieldDiscoverer();
 
     @Override
     public boolean isSuitable(@NotNull Type type) {
@@ -61,7 +63,7 @@ public class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
     }
 
     @Override
-    public @NotNull DataApplier<Object[]> createDataApplier(@NotNull Type type) {
+    public InstanceFactory<Object[]> createInstanceFactory(@NotNull Type type) {
         final Class<?> clazz = GenericTypeReflector.erase(type);
         final RecordComponent[] recordComponents = clazz.getRecordComponents();
         final Class<?>[] constructorParams = new Class<?>[recordComponents.length];
@@ -81,7 +83,7 @@ public class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
         }
         clazzConstructor.setAccessible(true);
 
-        return new DataApplier<>() {
+        return new InstanceFactory<>() {
             @Override
             public Object[] begin() {
                 return new Object[recordComponents.length];

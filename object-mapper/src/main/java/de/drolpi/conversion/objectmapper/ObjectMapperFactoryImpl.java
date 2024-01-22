@@ -18,7 +18,6 @@ package de.drolpi.conversion.objectmapper;
 
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.objectmapper.discoverer.FieldDiscoverer;
-import de.drolpi.conversion.objectmapper.discoverer.RecordFieldDiscoverer;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +29,11 @@ import java.util.Map;
 
 final class ObjectMapperFactoryImpl implements ObjectMapper.Factory {
 
-    static final ObjectMapper.Factory INSTANCE = ObjectMapper.factoryBuilder().addDiscoverer(FieldDiscoverer.create()).addDiscoverer(new RecordFieldDiscoverer()).build();
+    static final ObjectMapper.Factory INSTANCE = ObjectMapper
+        .factoryBuilder()
+        .addDiscoverer(FieldDiscoverer.create())
+        .addDiscoverer(FieldDiscoverer.record())
+        .build();
     private static final int MAXIMUM_MAPPERS_SIZE = 64;
 
     private final Map<Type, ObjectMapper<?>> mappers = new LinkedHashMap<>() {
@@ -80,11 +83,11 @@ final class ObjectMapperFactoryImpl implements ObjectMapper.Factory {
     }
 
     private <T, U> ObjectMapper<T> createMapper(final Type type, final FieldDiscoverer<U> discoverer) {
-        final FieldDiscoverer.DataApplier<U> applier = discoverer.createDataApplier(type);
+        final FieldDiscoverer.InstanceFactory<U> instanceFactory = discoverer.createInstanceFactory(type);
         final List<FieldDiscoverer.FieldData<T, U>> fields = new ArrayList<>();
         discoverer.discoverFields(type, fields);
 
-        return new ObjectMapperImpl<>(fields, applier, this.conversionBus);
+        return new ObjectMapperImpl<>(fields, instanceFactory, this.conversionBus);
     }
 
     static final class BuilderImpl implements ObjectMapper.Factory.Builder {

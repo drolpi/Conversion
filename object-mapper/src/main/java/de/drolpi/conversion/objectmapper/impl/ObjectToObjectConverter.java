@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 
-public class ObjectToObjectConverter extends AbstractObjectMappingConverter implements NonGenericConverter {
+public final class ObjectToObjectConverter extends AbstractObjectMappingConverter implements NonGenericConverter {
 
     public ObjectToObjectConverter(ObjectMapper.Factory factory) {
         super(factory);

@@ -35,7 +35,11 @@ public interface ObjectMapper<T> {
 
     T load(Map<String, Object> source);
 
+    void load(T value, Map<String, Object> source);
+
     Map<String, Object> save(T source);
+
+    void save(Map<String, Object> target, T value);
 
     interface Factory {
 

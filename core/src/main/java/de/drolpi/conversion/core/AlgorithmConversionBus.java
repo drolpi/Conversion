@@ -18,7 +18,7 @@ package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.core.exception.ConversionFailedException;
-import de.drolpi.conversion.core.util.ClassCollectorUtil;
+import de.drolpi.conversion.core.util.ClassTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,8 +62,8 @@ class AlgorithmConversionBus extends BasicConversionBus {
 
         private void algorithm(Type source, Type target, AlgorithmPath previousPath, AlgorithmResult result) {
             // Search the whole type tree
-            final List<Class<?>> sourceTree = ClassCollectorUtil.classTree(source);
-            final List<Class<?>> targetTree = ClassCollectorUtil.classTree(target);
+            final List<Class<?>> sourceTree = ClassTreeUtil.collect(source);
+            final List<Class<?>> targetTree = ClassTreeUtil.collect(target);
 
             // Iterate through the whole class tree to find a converter with a matching source type
             for (final Class<?> sourceCandidate : sourceTree) {

@@ -26,6 +26,10 @@ import java.util.function.Supplier;
 
 public interface FieldDiscoverer<T> {
 
+    static @NotNull RecordFieldDiscoverer record() {
+        return RecordFieldDiscoverer.INSTANCE;
+    }
+
     static @NotNull FieldDiscoverer<?> create() {
         return ObjectFieldDiscoverer.EMPTY_CONSTRUCTOR_INSTANCE;
     }
@@ -38,15 +42,15 @@ public interface FieldDiscoverer<T> {
 
     <U> void discoverFields(@NotNull Type type, List<FieldData<U, T>> fields);
 
-    @NotNull DataApplier<T> createDataApplier(@NotNull Type type);
+    InstanceFactory<T> createInstanceFactory(@NotNull Type type);
 
-    interface DataApplier<T> {
+    interface InstanceFactory<T> {
 
         T begin();
 
-        void complete(Object value, T intermediate);
-
         Object complete(T intermediate);
+
+        void complete(Object value, T intermediate);
 
     }
 

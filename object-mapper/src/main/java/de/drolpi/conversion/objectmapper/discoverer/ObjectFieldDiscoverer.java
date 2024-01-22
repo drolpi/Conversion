@@ -16,7 +16,7 @@
 
 package de.drolpi.conversion.objectmapper.discoverer;
 
-import de.drolpi.conversion.core.util.ClassCollectorUtil;
+import de.drolpi.conversion.core.util.ClassTreeUtil;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("ClassCanBeRecord")
-public class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>> {
+public final class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>> {
 
     static final ObjectFieldDiscoverer EMPTY_CONSTRUCTOR_INSTANCE = new ObjectFieldDiscoverer(new EmptyConstructorFactory());
 
@@ -50,7 +50,7 @@ public class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>
 
     @Override
     public <U> void discoverFields(@NotNull Type type, List<FieldData<U, Map<Field, Object>>> fields) {
-        final List<Class<?>> sourceTree = ClassCollectorUtil.classTree(type);
+        final List<Class<?>> sourceTree = ClassTreeUtil.collect(type);
 
         for (final Class<?> collectClass : sourceTree) {
             for (final Field field : collectClass.getDeclaredFields()) {
@@ -73,10 +73,10 @@ public class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>
     }
 
     @Override
-    public @NotNull DataApplier<Map<Field, Object>> createDataApplier(@NotNull Type type) {
+    public InstanceFactory<Map<Field, Object>> createInstanceFactory(@NotNull Type type) {
         final Supplier<Object> maker = this.instanceFactory.apply(type);
 
-        return new DataApplier<>() {
+        return new InstanceFactory<>() {
             @Override
             public Map<Field, Object> begin() {
                 return new HashMap<>();

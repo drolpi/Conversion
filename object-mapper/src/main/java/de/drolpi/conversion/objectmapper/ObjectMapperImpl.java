@@ -27,35 +27,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@SuppressWarnings({"ClassCanBeRecord", "unchecked"})
+@SuppressWarnings({"unchecked", "ClassCanBeRecord"})
 final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
 
-    //TODO: Add methods to interface
-
     private final List<FieldDiscoverer.FieldData<T, U>> fieldData;
-    private final FieldDiscoverer.DataApplier<U> dataApplier;
+    private final FieldDiscoverer.InstanceFactory<U> instanceFactory;
     private final ConversionBus conversionBus;
 
-    ObjectMapperImpl(List<FieldDiscoverer.FieldData<T, U>> fieldData, FieldDiscoverer.DataApplier<U> dataApplier, ConversionBus conversionBus) {
+    ObjectMapperImpl(List<FieldDiscoverer.FieldData<T, U>> fieldData, FieldDiscoverer.InstanceFactory<U> instanceFactory, ConversionBus conversionBus) {
         this.fieldData = Collections.unmodifiableList(fieldData);
-        this.dataApplier = dataApplier;
+        this.instanceFactory = instanceFactory;
         this.conversionBus = conversionBus;
     }
 
     @Override
     public T load(Map<String, Object> source) {
-        return this.load(source, intermediate -> (T) this.dataApplier.complete(intermediate));
+        return this.load(source, intermediate -> (T) this.instanceFactory.complete(intermediate));
     }
 
+    @Override
     public void load(T value, Map<String, Object> source) {
         this.load(source, intermediate -> {
-            this.dataApplier.complete(value, intermediate);
+            this.instanceFactory.complete(value, intermediate);
             return value;
         });
     }
 
     private T load(Map<String, Object> source, Function<U, T> completer) {
-        final U fieldData = this.dataApplier.begin();
+        final U fieldData = this.instanceFactory.begin();
 
         // Iterate through all fields
         for (final FieldDiscoverer.FieldData<T, U> field : this.fieldData) {
@@ -89,6 +88,7 @@ final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
         return target;
     }
 
+    @Override
     public void save(Map<String, Object> target, T value) {
         // Iterate through all fields
         for (final FieldDiscoverer.FieldData<T, U> fieldData : this.fieldData) {

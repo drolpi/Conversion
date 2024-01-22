@@ -25,13 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class ClassCollectorUtil {
+public final class ClassTreeUtil {
 
-    private ClassCollectorUtil() {
+    private ClassTreeUtil() {
         throw new RuntimeException();
     }
 
-    public static @NotNull List<Class<?>> classTree(@NotNull final Type type) {
+    public static @NotNull List<Class<?>> collect(@NotNull final Type type) {
         final Class<?> erasedType = GenericTypeReflector.erase(GenericTypeReflector.box(type));
         final List<Class<?>> tree = new ArrayList<>(20);
         final Set<Class<?>> visited = new HashSet<>(20);

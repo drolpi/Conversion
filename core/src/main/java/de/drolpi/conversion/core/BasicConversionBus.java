@@ -20,7 +20,7 @@ import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
-import de.drolpi.conversion.core.util.ClassCollectorUtil;
+import de.drolpi.conversion.core.util.ClassTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -199,8 +199,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
         protected NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
             // Search the full type tree
-            final List<Class<?>> sourceTree = ClassCollectorUtil.classTree(sourceType);
-            final List<Class<?>> targetTree = ClassCollectorUtil.classTree(targetType);
+            final List<Class<?>> sourceTree = ClassTreeUtil.collect(sourceType);
+            final List<Class<?>> targetTree = ClassTreeUtil.collect(targetType);
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
