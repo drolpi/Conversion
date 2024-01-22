@@ -18,12 +18,11 @@ package de.drolpi.conversion.core;
 
 import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
 public interface ConversionBus {
-
-    //TODO: Enable null sources
 
     static @NotNull ConfigurableConversionBus create() {
         return new BasicConversionBus();
@@ -41,15 +40,15 @@ public interface ConversionBus {
         return new DefaultAlgorithmConversionBus();
     }
 
-    Object convert(@NotNull Object source, @NotNull Type targetType);
+    Object convert(@Nullable Object source, @NotNull Type targetType);
 
     @SuppressWarnings("unchecked")
-    default <T> T convert(@NotNull Object source, @NotNull Class<T> targetType) {
+    default <T> T convert(@Nullable Object source, @NotNull Class<T> targetType) {
         return (T) this.convert(source, (Type) targetType);
     }
 
     @SuppressWarnings("unchecked")
-    default <T> T convert(@NotNull Object source, @NotNull TypeToken<T> typeToken) {
+    default <T> T convert(@Nullable Object source, @NotNull TypeToken<T> typeToken) {
         return (T) this.convert(source, typeToken.getType());
     }
 }

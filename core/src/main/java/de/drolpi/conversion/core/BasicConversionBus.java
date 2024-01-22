@@ -19,17 +19,13 @@ package de.drolpi.conversion.core;
 import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
-import de.drolpi.conversion.core.exception.ConversionFailedException;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
 import de.drolpi.conversion.core.util.ClassCollectorUtil;
-import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -90,20 +86,17 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @Override
-    public Object convert(@NotNull final Object source, @NotNull final Type targetType) {
-        final Class<?> sourceType = source.getClass();
-        final Type boxedSourceType = GenericTypeReflector.box(sourceType);
-        final Type boxedTargetType = GenericTypeReflector.box(targetType);
-
-        final Converter<Object, Object> converter = this.converter(boxedSourceType, boxedTargetType);
+    public Object convert(@Nullable final Object source, @NotNull final Type targetType) {
+        final Class<?> sourceType = source == null ? Object.class : source.getClass();
+        final Converter<Object, Object> converter = this.converter(sourceType, targetType);
 
         if (converter == null) {
             // No Converter found
-            throw new ConverterNotFoundException(boxedSourceType, boxedTargetType);
+            throw new ConverterNotFoundException(sourceType, targetType);
         }
 
         //TODO:
-        return converter.convert(source, boxedSourceType, boxedTargetType);
+        return converter.convert(source, sourceType, targetType);
     }
 
     private @Nullable NonGenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
@@ -176,8 +169,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     protected static class ConverterRegistrar {
 
-        private final Set<NonGenericConverter> globalConverters = new CopyOnWriteArraySet<>();
         protected final Map<NonGenericConverter.ConversionPath, Deque<NonGenericConverter>> converters = new ConcurrentHashMap<>();
+        private final Set<NonGenericConverter> globalConverters = new CopyOnWriteArraySet<>();
 
         private void add(@NotNull final NonGenericConverter converter) {
             final Set<NonGenericConverter.ConversionPath> paths = converter.paths();
