@@ -18,10 +18,13 @@ package de.drolpi.conversion.objectmapper;
 
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.objectmapper.discoverer.FieldDiscoverer;
+import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 public interface ObjectMapper<T> {
 
@@ -33,22 +36,29 @@ public interface ObjectMapper<T> {
         return new ObjectMapperFactoryImpl.BuilderImpl();
     }
 
-    T load(Map<String, Object> source);
+    @NotNull T load(@NotNull Map<String, Object> source);
 
-    void load(T value, Map<String, Object> source);
+    void load(@NotNull T value, @NotNull Map<String, Object> source);
 
-    Map<String, Object> save(T source);
+    @NotNull Map<String, Object> save(@NotNull T source);
 
-    void save(Map<String, Object> target, T value);
+    void save(@NotNull Map<String, Object> target, @NotNull T value);
 
     interface Factory {
 
+        @NotNull ObjectMapper<?> get(@NotNull Type type);
+
         @SuppressWarnings("unchecked")
         default @NotNull <T> ObjectMapper<T> get(@NotNull Class<T> type) {
+            requireNonNull(type, "type");
             return (ObjectMapper<T>) this.get((Type) type);
         }
 
-        @NotNull ObjectMapper<?> get(@NotNull Type type);
+        @SuppressWarnings("unchecked")
+        default @NotNull <T> ObjectMapper<T> get(@NotNull TypeToken<T> type) {
+            requireNonNull(type, "type");
+            return (ObjectMapper<T>) this.get(type.getType());
+        }
 
         interface Builder {
 

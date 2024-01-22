@@ -24,6 +24,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 public interface FieldDiscoverer<T> {
 
     static @NotNull RecordFieldDiscoverer record() {
@@ -35,22 +37,23 @@ public interface FieldDiscoverer<T> {
     }
 
     static @NotNull FieldDiscoverer<?> create(@NotNull Function<Type, Supplier<Object>> instanceFactory) {
+        requireNonNull(instanceFactory, "instanceFactory");
         return new ObjectFieldDiscoverer(instanceFactory);
     }
 
     boolean isSuitable(@NotNull Type type);
 
-    <U> void discoverFields(@NotNull Type type, List<FieldData<U, T>> fields);
+    <U> void discoverFields(@NotNull Type type, @NotNull List<FieldData<U, T>> fields);
 
-    InstanceFactory<T> createInstanceFactory(@NotNull Type type);
+    @NotNull InstanceFactory<T> createInstanceFactory(@NotNull Type type);
 
     interface InstanceFactory<T> {
 
-        T begin();
+        @NotNull T begin();
 
-        Object complete(T intermediate);
+        @NotNull Object complete(@NotNull T intermediate);
 
-        void complete(Object value, T intermediate);
+        void complete(@NotNull Object value, @NotNull T intermediate);
 
     }
 

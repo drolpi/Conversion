@@ -19,6 +19,7 @@ package de.drolpi.conversion.objectmapper;
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.objectmapper.discoverer.FieldDiscoverer;
 import io.leangen.geantyref.GenericTypeReflector;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static java.util.Objects.requireNonNull;
+
 @SuppressWarnings({"unchecked", "ClassCanBeRecord"})
 final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
 
@@ -34,19 +37,24 @@ final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
     private final FieldDiscoverer.InstanceFactory<U> instanceFactory;
     private final ConversionBus conversionBus;
 
-    ObjectMapperImpl(List<FieldDiscoverer.FieldData<T, U>> fieldData, FieldDiscoverer.InstanceFactory<U> instanceFactory, ConversionBus conversionBus) {
+    ObjectMapperImpl(final List<FieldDiscoverer.FieldData<T, U>> fieldData, final FieldDiscoverer.InstanceFactory<U> instanceFactory,
+        final ConversionBus conversionBus
+    ) {
         this.fieldData = Collections.unmodifiableList(fieldData);
         this.instanceFactory = instanceFactory;
         this.conversionBus = conversionBus;
     }
 
     @Override
-    public T load(Map<String, Object> source) {
+    public @NotNull T load(@NotNull Map<String, Object> source) {
+        requireNonNull(source, "source");
         return this.load(source, intermediate -> (T) this.instanceFactory.complete(intermediate));
     }
 
     @Override
-    public void load(T value, Map<String, Object> source) {
+    public void load(@NotNull T value, @NotNull Map<String, Object> source) {
+        requireNonNull(value, "value");
+        requireNonNull(source, "source");
         this.load(source, intermediate -> {
             this.instanceFactory.complete(value, intermediate);
             return value;
@@ -81,7 +89,8 @@ final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
     }
 
     @Override
-    public Map<String, Object> save(T value) {
+    public @NotNull Map<String, Object> save(@NotNull T value) {
+        requireNonNull(value, "value");
         final Map<String, Object> target = new HashMap<>();
 
         this.save(target, value);
@@ -89,7 +98,9 @@ final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
     }
 
     @Override
-    public void save(Map<String, Object> target, T value) {
+    public void save(@NotNull Map<String, Object> target, @NotNull T value) {
+        requireNonNull(target, "target");
+        requireNonNull(value, "value");
         // Iterate through all fields
         for (final FieldDiscoverer.FieldData<T, U> fieldData : this.fieldData) {
             // Get value from field

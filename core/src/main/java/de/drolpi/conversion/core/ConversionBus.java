@@ -22,6 +22,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Represents the entry point interface for type conversion.
+ */
 public interface ConversionBus {
 
     static @NotNull ConfigurableConversionBus create() {
@@ -40,15 +45,38 @@ public interface ConversionBus {
         return new DefaultAlgorithmConversionBus();
     }
 
-    Object convert(@Nullable Object source, @NotNull Type targetType);
+    /**
+     * Converts the given {@code source} to the specified {@code targetType}.
+     *
+     * @param source the source object to convert (maybe {@code null})
+     * @param targetType the target type as {@link Type} to convert to (required)
+     * @return the converted object, an instance of targetType
+     */
+    @Nullable Object convert(@Nullable Object source, @NotNull Type targetType);
 
+    /**
+     * Converts the given {@code source} to the specified {@code targetType}.
+     *
+     * @param source the source object to convert (maybe {@code null})
+     * @param targetType the target type as {@link Class} to convert to (required)
+     * @return the converted object, an instance of targetType
+     */
     @SuppressWarnings("unchecked")
-    default <T> T convert(@Nullable Object source, @NotNull Class<T> targetType) {
+    default <T> @Nullable T convert(@Nullable Object source, @NotNull Class<T> targetType) {
+        requireNonNull(targetType, "targetType");
         return (T) this.convert(source, (Type) targetType);
     }
 
+    /**
+     * Converts the given {@code source} to the specified {@code targetType}.
+     *
+     * @param source the source object to convert (maybe {@code null})
+     * @param targetType the target type as {@link TypeToken} to convert to (required)
+     * @return the converted object, an instance of targetType
+     */
     @SuppressWarnings("unchecked")
-    default <T> T convert(@Nullable Object source, @NotNull TypeToken<T> typeToken) {
-        return (T) this.convert(source, typeToken.getType());
+    default <T> @Nullable T convert(@Nullable Object source, @NotNull TypeToken<T> targetType) {
+        requireNonNull(targetType, "targetType");
+        return (T) this.convert(source, targetType.getType());
     }
 }

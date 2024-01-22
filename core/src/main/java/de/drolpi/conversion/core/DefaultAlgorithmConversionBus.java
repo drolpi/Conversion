@@ -16,9 +16,9 @@
 
 package de.drolpi.conversion.core;
 
-public class DefaultAlgorithmConversionBus extends AlgorithmConversionBus {
+class DefaultAlgorithmConversionBus extends AlgorithmConversionBus {
 
-    public DefaultAlgorithmConversionBus() {
+    DefaultAlgorithmConversionBus() {
         DefaultConversionBus.registerDefaults(this);
     }
 }

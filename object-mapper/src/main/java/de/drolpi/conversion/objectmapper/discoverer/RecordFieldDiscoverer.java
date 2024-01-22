@@ -26,18 +26,23 @@ import java.lang.reflect.RecordComponent;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 final class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
 
     static final RecordFieldDiscoverer INSTANCE = new RecordFieldDiscoverer();
 
     @Override
-    public boolean isSuitable(@NotNull Type type) {
+    public boolean isSuitable(@NotNull final Type type) {
+        requireNonNull(type, "type");
         final Class<?> erasedType = GenericTypeReflector.erase(type);
         return erasedType.isRecord();
     }
 
     @Override
-    public <U> void discoverFields(@NotNull Type type, List<FieldData<U, Object[]>> fields) {
+    public <U> void discoverFields(@NotNull final Type type, @NotNull final List<FieldData<U, Object[]>> fields) {
+        requireNonNull(type, "type");
+        requireNonNull(fields, "fields");
         final Class<?> clazz = GenericTypeReflector.erase(type);
         final RecordComponent[] recordComponents = clazz.getRecordComponents();
 
@@ -63,7 +68,8 @@ final class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
     }
 
     @Override
-    public InstanceFactory<Object[]> createInstanceFactory(@NotNull Type type) {
+    public @NotNull InstanceFactory<Object[]> createInstanceFactory(@NotNull final Type type) {
+        requireNonNull(type, "type");
         final Class<?> clazz = GenericTypeReflector.erase(type);
         final RecordComponent[] recordComponents = clazz.getRecordComponents();
         final Class<?>[] constructorParams = new Class<?>[recordComponents.length];
@@ -85,17 +91,18 @@ final class RecordFieldDiscoverer implements FieldDiscoverer<Object[]> {
 
         return new InstanceFactory<>() {
             @Override
-            public Object[] begin() {
+            public Object @NotNull [] begin() {
                 return new Object[recordComponents.length];
             }
 
             @Override
-            public void complete(Object value, Object[] intermediate) {
-
+            public void complete(@NotNull Object value, Object @NotNull [] intermediate) {
+                throw new RuntimeException("Mutable instances are not supported for records");
             }
 
             @Override
-            public Object complete(Object[] intermediate) {
+            public @NotNull Object complete(Object @NotNull [] intermediate) {
+                requireNonNull(intermediate, "intermediate");
                 try {
                     return clazzConstructor.newInstance(intermediate);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

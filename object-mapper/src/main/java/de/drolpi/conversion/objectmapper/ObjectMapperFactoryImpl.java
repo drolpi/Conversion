@@ -27,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 final class ObjectMapperFactoryImpl implements ObjectMapper.Factory {
 
     static final ObjectMapper.Factory INSTANCE = ObjectMapper
@@ -46,12 +48,14 @@ final class ObjectMapperFactoryImpl implements ObjectMapper.Factory {
     private final ConversionBus conversionBus;
 
     ObjectMapperFactoryImpl(final BuilderImpl builder) {
+        requireNonNull(builder, "builder");
         this.fieldDiscoverers = new ArrayList<>(builder.discoverer);
         this.conversionBus = builder.conversionBus;
     }
 
     @Override
     public @NotNull ObjectMapper<?> get(@NotNull final Type type) {
+        requireNonNull(type, "type");
         // Check if type is missing type parameters
         if (GenericTypeReflector.isMissingTypeParameters(type)) {
             throw new RuntimeException("Raw types are not supported!");
@@ -93,22 +97,27 @@ final class ObjectMapperFactoryImpl implements ObjectMapper.Factory {
     static final class BuilderImpl implements ObjectMapper.Factory.Builder {
 
         private final List<FieldDiscoverer<?>> discoverer = new ArrayList<>();
-        private ConversionBus conversionBus = ConversionBus.createDefault();
+        private ConversionBus conversionBus;
 
         @Override
         public @NotNull Builder addDiscoverer(@NotNull final FieldDiscoverer<?> discoverer) {
+            requireNonNull(discoverer, "discoverer");
             this.discoverer.add(discoverer);
             return this;
         }
 
         @Override
         public @NotNull Builder conversionBus(@NotNull final ConversionBus conversionBus) {
+            requireNonNull(conversionBus, "conversionBus");
             this.conversionBus = conversionBus;
             return this;
         }
 
         @Override
         public ObjectMapper.@NotNull Factory build() {
+            if (this.conversionBus == null) {
+                this.conversionBus = ConversionBus.createDefault();
+            }
             return new ObjectMapperFactoryImpl(this);
         }
     }

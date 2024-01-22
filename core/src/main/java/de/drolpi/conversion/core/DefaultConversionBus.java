@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 
 class DefaultConversionBus extends BasicConversionBus {
 
-    public DefaultConversionBus() {
+    DefaultConversionBus() {
         DefaultConversionBus.registerDefaults(this);
     }
     

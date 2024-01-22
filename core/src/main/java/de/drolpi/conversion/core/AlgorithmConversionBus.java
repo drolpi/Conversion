@@ -25,22 +25,27 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 class AlgorithmConversionBus extends BasicConversionBus {
 
-    public AlgorithmConversionBus() {
+    AlgorithmConversionBus() {
         super(new AlgorithmConverterRegistrar());
     }
 
     private static final class AlgorithmConverterRegistrar extends ConverterRegistrar {
 
         @Override
-        protected NonGenericConverter find(@NotNull Type sourceType, @NotNull Type targetType) {
+        protected NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
+            requireNonNull(sourceType, "sourceType");
+            requireNonNull(targetType, "targetType");
             // Try to find an explicitly registered converter
             final NonGenericConverter converter = super.find(sourceType, targetType);
             if (converter != null) {
@@ -60,7 +65,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
             return new AlgorithmConverter(result);
         }
 
-        private void algorithm(Type source, Type target, AlgorithmPath previousPath, AlgorithmResult result) {
+        private void algorithm(final Type source, final Type target, final AlgorithmPath previousPath, final AlgorithmResult result) {
             // Search the whole type tree
             final List<Class<?>> sourceTree = ClassTreeUtil.collect(source);
             final List<Class<?>> targetTree = ClassTreeUtil.collect(target);
@@ -106,7 +111,9 @@ class AlgorithmConversionBus extends BasicConversionBus {
     private record AlgorithmConverter(AlgorithmResult result) implements NonGenericConverter {
 
         @Override
-        public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        public @Nullable Object convert(@Nullable final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+            requireNonNull(sourceType, "sourceType");
+            requireNonNull(targetType, "targetType");
             // Iterate through all the possibilities to try them out
             for (final AlgorithmPath path : this.result) {
                 try {
@@ -120,7 +127,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
             throw new ConversionFailedException(sourceType, targetType, source);
         }
 
-        private Object tryConvert(AlgorithmPath path, Object source, Type sourceType, Type targetType) {
+        private Object tryConvert(final AlgorithmPath path, final Object source, final Type sourceType, final Type targetType) {
             Object result = source;
 
             // Iterate through all ways of the path
@@ -158,7 +165,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
 
         @Override
         public @NotNull Set<ConversionPath> paths() {
-            return Set.of();
+            return Collections.emptySet();
         }
 
         @Override

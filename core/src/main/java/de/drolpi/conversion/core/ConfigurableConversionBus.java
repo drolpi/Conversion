@@ -16,6 +16,10 @@
 
 package de.drolpi.conversion.core;
 
+/**
+ * Represents a configurable conversion bus that extends the read-only operations exposed by {@link ConversionBus} and
+ * the mutating operations of {@link ConverterRegistry}.
+ */
 public interface ConfigurableConversionBus extends ConverterRegistry, ConversionBus {
 
 }

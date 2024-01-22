@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 @SuppressWarnings("ClassCanBeRecord")
 public final class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>> {
 
@@ -38,18 +40,22 @@ public final class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, O
 
     private final Function<Type, Supplier<Object>> instanceFactory;
 
-    ObjectFieldDiscoverer(Function<Type, Supplier<Object>> instanceFactory) {
+    ObjectFieldDiscoverer(@NotNull final Function<Type, Supplier<Object>> instanceFactory) {
+        requireNonNull(instanceFactory, "instanceFactory");
         this.instanceFactory = instanceFactory;
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type type) {
+    public boolean isSuitable(@NotNull final Type type) {
+        requireNonNull(type, "type");
         final Class<?> erasedTargetType = GenericTypeReflector.erase(type);
         return !erasedTargetType.isInterface() && !erasedTargetType.isRecord();
     }
 
     @Override
-    public <U> void discoverFields(@NotNull Type type, List<FieldData<U, Map<Field, Object>>> fields) {
+    public <U> void discoverFields(@NotNull final Type type, @NotNull final List<FieldData<U, Map<Field, Object>>> fields) {
+        requireNonNull(type, "type");
+        requireNonNull(fields, "fields");
         final List<Class<?>> sourceTree = ClassTreeUtil.collect(type);
 
         for (final Class<?> collectClass : sourceTree) {
@@ -73,17 +79,20 @@ public final class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, O
     }
 
     @Override
-    public InstanceFactory<Map<Field, Object>> createInstanceFactory(@NotNull Type type) {
+    public @NotNull InstanceFactory<Map<Field, Object>> createInstanceFactory(@NotNull final Type type) {
+        requireNonNull(type, "type");
         final Supplier<Object> maker = this.instanceFactory.apply(type);
 
         return new InstanceFactory<>() {
             @Override
-            public Map<Field, Object> begin() {
+            public @NotNull Map<Field, Object> begin() {
                 return new HashMap<>();
             }
 
             @Override
-            public void complete(final Object instance, final Map<Field, Object> fieldData) {
+            public void complete(@NotNull final Object instance, @NotNull final Map<Field, Object> fieldData) {
+                requireNonNull(instance, "instance");
+                requireNonNull(fieldData, "fieldData");
                 for (final Map.Entry<Field, Object> entry : fieldData.entrySet()) {
                     try {
                         entry.getKey().set(instance, entry.getValue());
@@ -94,7 +103,8 @@ public final class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, O
             }
 
             @Override
-            public Object complete(final Map<Field, Object> fieldData) {
+            public @NotNull Object complete(@NotNull final Map<Field, Object> fieldData) {
+                requireNonNull(fieldData, "fieldData");
                 final Object instance = maker == null ? null : maker.get();
                 if (instance == null) {
                     throw new RuntimeException("Unable to create instances for this type");
@@ -108,7 +118,8 @@ public final class ObjectFieldDiscoverer implements FieldDiscoverer<Map<Field, O
     private static final class EmptyConstructorFactory implements Function<Type, Supplier<Object>> {
 
         @Override
-        public Supplier<Object> apply(final Type type) {
+        public Supplier<Object> apply(@NotNull final Type type) {
+            requireNonNull(type, "type");
             try {
                 final Constructor<?> constructor = GenericTypeReflector.erase(type).getDeclaredConstructor();
                 constructor.setAccessible(true);

@@ -17,12 +17,13 @@
 package de.drolpi.conversion.core.util;
 
 import io.leangen.geantyref.TypeFactory;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static io.leangen.geantyref.GenericTypeReflector.erase;
+import static java.util.Objects.requireNonNull;
 
 public final class Types {
 
@@ -31,12 +32,15 @@ public final class Types {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Class<List<T>> list(Class<T> value) {
+    public static <T> @NotNull Class<List<T>> list(@NotNull final Class<T> value) {
+        requireNonNull(value, "value");
         return (Class<List<T>>) erase(TypeFactory.parameterizedClass(List.class, value));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, U> Class<Map<T, U>> map(Class<T> key, Class<U> value) {
+    public static <T, U> @NotNull Class<Map<T, U>> map(@NotNull final Class<T> key, Class<U> value) {
+        requireNonNull(key, "key");
+        requireNonNull(value, "value");
         return (Class<Map<T, U>>) erase(TypeFactory.parameterizedClass(Map.class, key, value));
     }
 }

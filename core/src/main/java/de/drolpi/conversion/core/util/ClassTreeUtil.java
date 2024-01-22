@@ -23,7 +23,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 public final class ClassTreeUtil {
 
@@ -32,6 +35,7 @@ public final class ClassTreeUtil {
     }
 
     public static @NotNull List<Class<?>> collect(@NotNull final Type type) {
+        requireNonNull(type, "type");
         final Class<?> erasedType = GenericTypeReflector.erase(GenericTypeReflector.box(type));
         final List<Class<?>> tree = new ArrayList<>(20);
         final Set<Class<?>> visited = new HashSet<>(20);
@@ -68,14 +72,20 @@ public final class ClassTreeUtil {
     private static void collectInterfaces(@NotNull final Class<?> type, final boolean asArray,
         @NotNull final List<Class<?>> hierarchy, @NotNull final Set<Class<?>> visited
     ) {
+        requireNonNull(type, "type");
+        requireNonNull(hierarchy, "hierarchy");
+        requireNonNull(visited, "visited");
         for (final Class<?> implementedInterface : type.getInterfaces()) {
             collectClass(hierarchy.size(), implementedInterface, asArray, hierarchy, visited);
         }
     }
 
-    private static void collectClass(int index, @NotNull Class<?> type, boolean asArray,
+    private static void collectClass(final int index, @NotNull Class<?> type, final boolean asArray,
         @NotNull final List<Class<?>> hierarchy, @NotNull final Set<Class<?>> visited
     ) {
+        requireNonNull(type, "type");
+        requireNonNull(hierarchy, "hierarchy");
+        requireNonNull(visited, "visited");
         if (asArray) {
             type = type.arrayType();
         }

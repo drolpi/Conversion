@@ -20,13 +20,41 @@ import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents an interface to register type converters.
+ */
 public interface ConverterRegistry {
 
-    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> target, @NotNull Converter<U, V> converter);
+    /**
+     * Adds a converter to this registry.
+     *
+     * @param source the source type the converter can convert
+     * @param targetType the target type the converter converts to
+     * @param converter the converter
+     * @param <U> the source type
+     * @param <V> the target type
+     */
+    <U, V> void register(@NotNull Class<? extends U> source, @NotNull Class<V> targetType, @NotNull Converter<U, V> converter);
 
+    /**
+     * Adds a non-generic converter to this registry.
+     *
+     * @param converter the converter
+     */
     void register(@NotNull NonGenericConverter converter);
 
-    void unregister(@NotNull Class<?> source, @NotNull Class<?> target);
+    /**
+     * Remove any converters that convert from {@code sourceType} to {@code targetType}.
+     *
+     * @param sourceType the source type
+     * @param targetType the target type
+     */
+    void unregister(@NotNull Class<?> sourceType, @NotNull Class<?> targetType);
 
+    /**
+     * Remove a non-generic converter from this registry.
+     *
+     * @param converter the converter
+     */
     void unregister(@NotNull NonGenericConverter converter);
 }

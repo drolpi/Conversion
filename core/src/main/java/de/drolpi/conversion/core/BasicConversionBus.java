@@ -19,6 +19,7 @@ package de.drolpi.conversion.core;
 import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
+import de.drolpi.conversion.core.exception.ConversionFailedException;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
 import de.drolpi.conversion.core.util.ClassTreeUtil;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import static java.util.Objects.requireNonNull;
+
 class BasicConversionBus implements ConfigurableConversionBus {
 
     private static final NoOpConverter NO_MATCH_CONVERTER = new NoOpConverter();
@@ -46,7 +49,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
         this.registrar = new ConverterRegistrar();
     }
 
-    public BasicConversionBus(ConverterRegistrar registrar) {
+    BasicConversionBus(@NotNull final ConverterRegistrar registrar) {
+        requireNonNull(registrar, "registrar");
         this.registrar = registrar;
     }
 
@@ -54,12 +58,16 @@ class BasicConversionBus implements ConfigurableConversionBus {
     public <U, V> void register(@NotNull final Class<? extends U> sourceType, final @NotNull Class<V> targetType,
         @NotNull final Converter<U, V> converter
     ) {
+        requireNonNull(sourceType, "sourceType");
+        requireNonNull(targetType, "targetType");
+        requireNonNull(converter, "converter");
         // Register via adapter (GenericConverter)
         this.register(new ConverterAdapter(converter, sourceType, targetType));
     }
 
     @Override
     public void register(@NotNull final NonGenericConverter converter) {
+        requireNonNull(converter, "converter");
         // Register in registrar
         this.registrar.add(converter);
 
@@ -68,16 +76,19 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @Override
-    public void unregister(@NotNull Class<?> source, @NotNull Class<?> target) {
+    public void unregister(@NotNull final Class<?> sourceType, @NotNull final Class<?> targetType) {
+        requireNonNull(sourceType, "sourceType");
+        requireNonNull(targetType, "targetType");
         // Remove from registrar
-        this.registrar.remove(source, target);
+        this.registrar.remove(sourceType, targetType);
 
         // Invalidate cache because maybe a suitable converter is cached
         this.invalidateCache();
     }
 
     @Override
-    public void unregister(@NotNull NonGenericConverter converter) {
+    public void unregister(@NotNull final NonGenericConverter converter) {
+        requireNonNull(converter, "converter");
         // Remove from registrar
         this.registrar.remove(converter);
 
@@ -87,6 +98,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     @Override
     public Object convert(@Nullable final Object source, @NotNull final Type targetType) {
+        requireNonNull(targetType, "targetType");
         final Class<?> sourceType = source == null ? Object.class : source.getClass();
         final Converter<Object, Object> converter = this.converter(sourceType, targetType);
 
@@ -95,7 +107,6 @@ class BasicConversionBus implements ConfigurableConversionBus {
             throw new ConverterNotFoundException(sourceType, targetType);
         }
 
-        //TODO:
         return converter.convert(source, sourceType, targetType);
     }
 
@@ -170,9 +181,10 @@ class BasicConversionBus implements ConfigurableConversionBus {
     protected static class ConverterRegistrar {
 
         protected final Map<NonGenericConverter.ConversionPath, Deque<NonGenericConverter>> converters = new ConcurrentHashMap<>();
-        private final Set<NonGenericConverter> globalConverters = new CopyOnWriteArraySet<>();
+        protected final Set<NonGenericConverter> globalConverters = new CopyOnWriteArraySet<>();
 
         private void add(@NotNull final NonGenericConverter converter) {
+            requireNonNull(converter, "converter");
             final Set<NonGenericConverter.ConversionPath> paths = converter.paths();
 
             if (paths.isEmpty()) {
@@ -185,11 +197,14 @@ class BasicConversionBus implements ConfigurableConversionBus {
             }
         }
 
-        private void remove(@NotNull Class<?> source, @NotNull Class<?> target) {
-            this.converters.remove(new NonGenericConverter.ConversionPath(source, target));
+        private void remove(@NotNull final Class<?> sourceType, @NotNull final Class<?> targetType) {
+            requireNonNull(sourceType, "sourceType");
+            requireNonNull(targetType, "targetType");
+            this.converters.remove(new NonGenericConverter.ConversionPath(sourceType, targetType));
         }
 
-        private void remove(@NotNull NonGenericConverter converter) {
+        private void remove(@NotNull final NonGenericConverter converter) {
+            requireNonNull(converter, "converter");
             this.globalConverters.remove(converter);
 
             for (final NonGenericConverter.ConversionPath path : converter.paths()) {
@@ -198,6 +213,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         protected NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
+            requireNonNull(sourceType, "sourceType");
+            requireNonNull(targetType, "targetType");
             // Search the full type tree
             final List<Class<?>> sourceTree = ClassTreeUtil.collect(sourceType);
             final List<Class<?>> targetTree = ClassTreeUtil.collect(targetType);
@@ -217,6 +234,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         private NonGenericConverter converter(@NotNull final NonGenericConverter.ConversionPath path) {
+            requireNonNull(path, "path");
             // Check specifically registered converters
             final Deque<NonGenericConverter> convertersForPath = this.converters.get(path);
 
@@ -240,14 +258,14 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
     }
 
-    record CacheKey(Type sourceType, Type targetType) {
+    record CacheKey(@NotNull Type sourceType, @NotNull Type targetType) {
 
         @Override
         public boolean equals(@Nullable final Object other) {
             if (this == other) {
                 return true;
             }
-            if (!(other instanceof CacheKey otherCacheKey)) {
+            if (!(other instanceof final CacheKey otherCacheKey)) {
                 return false;
             }
             return (this.sourceType.equals(otherCacheKey.sourceType)) && this.targetType.equals(otherCacheKey.targetType);
@@ -272,6 +290,9 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
         @Override
         public Object convert(final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+            if (sourceType != targetType) {
+                throw new ConversionFailedException(sourceType, sourceType, targetType);
+            }
             return source;
         }
     }

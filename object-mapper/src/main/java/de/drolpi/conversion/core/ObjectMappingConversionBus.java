@@ -16,13 +16,15 @@
 
 package de.drolpi.conversion.core;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface ObjectMappingConversionBus extends ConfigurableConversionBus {
 
-    static ObjectMappingConversionBus createDefault() {
+    static @NotNull ObjectMappingConversionBus createDefault() {
         return new DefaultObjectMappingConversionBus();
     }
 
-    static ObjectMappingConversionBus createAlgorithmDefault() {
+    static @NotNull ObjectMappingConversionBus createAlgorithmDefault() {
         return new ObjectMappingAlgorithmConversionBus();
     }
 }

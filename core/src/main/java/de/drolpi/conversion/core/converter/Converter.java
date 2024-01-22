@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.converter;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
@@ -34,6 +35,6 @@ public interface Converter<T, U>  {
      * @param source the source object to convert, which must be an instance of {@code S} (never {@code null})
      * @return the converted object, which must be an instance of {@code T} (potentially {@code null})
      */
-    U convert(T source, @NotNull Type sourceType, @NotNull Type targetType);
+    @Nullable U convert(@Nullable T source, @NotNull Type sourceType, @NotNull Type targetType);
 
 }
