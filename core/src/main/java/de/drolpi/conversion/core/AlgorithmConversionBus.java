@@ -127,14 +127,9 @@ class AlgorithmConversionBus extends BasicConversionBus {
             for (int i = 0; i < path.size(); i++) {
                 final Deque<NonGenericConverter> converterDeque = path.get(i);
 
-                //TODO: Can a converter generate a value other than null from the source null? Currently not!
-                if (result == null) {
-                    return null;
-                }
-
                 // Iterate through all possible converters of the way to check their conditions
                 for (final NonGenericConverter nonGenericConverter : converterDeque) {
-                    final Type sourceT = result.getClass();
+                    final Type sourceT = result == null ? Object.class : result.getClass();
                     Type targetT = targetType;
                     boolean suitable = false;
 
