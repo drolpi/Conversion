@@ -26,28 +26,30 @@ import java.math.BigInteger;
 
 public final class StringToNumberConverter implements Converter<String, Number> {
 
-    //TODO: throw exception
-
     @Override
     public Number convert(String source, @NotNull Type sourceType, @NotNull Type targetType) {
         final String trimmed = source.trim();
 
-        if (Byte.class == targetType) {
-            return (this.isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));
-        } else if (Short.class == targetType) {
-            return (this.isHexNumber(trimmed) ? Short.decode(trimmed) : Short.valueOf(trimmed));
-        } else if (Integer.class == targetType) {
-            return (this.isHexNumber(trimmed) ? Integer.decode(trimmed) : Integer.valueOf(trimmed));
-        } else if (Long.class == targetType) {
-            return (this.isHexNumber(trimmed) ? Long.decode(trimmed) : Long.valueOf(trimmed));
-        } else if (BigInteger.class == targetType) {
-            return (this.isHexNumber(trimmed) ? this.decodeBigInteger(trimmed) : new BigInteger(trimmed));
-        } else if (Float.class == targetType) {
-            return Float.valueOf(trimmed);
-        } else if (Double.class == targetType) {
-            return Double.valueOf(trimmed);
-        } else if (BigDecimal.class == targetType || Number.class == targetType) {
-            return new BigDecimal(trimmed);
+        try {
+            if (Byte.class == targetType) {
+                return (this.isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));
+            } else if (Short.class == targetType) {
+                return (this.isHexNumber(trimmed) ? Short.decode(trimmed) : Short.valueOf(trimmed));
+            } else if (Integer.class == targetType) {
+                return (this.isHexNumber(trimmed) ? Integer.decode(trimmed) : Integer.valueOf(trimmed));
+            } else if (Long.class == targetType) {
+                return (this.isHexNumber(trimmed) ? Long.decode(trimmed) : Long.valueOf(trimmed));
+            } else if (BigInteger.class == targetType) {
+                return (this.isHexNumber(trimmed) ? this.decodeBigInteger(trimmed) : new BigInteger(trimmed));
+            } else if (Float.class == targetType) {
+                return Float.valueOf(trimmed);
+            } else if (Double.class == targetType) {
+                return Double.valueOf(trimmed);
+            } else if (BigDecimal.class == targetType || Number.class == targetType) {
+                return new BigDecimal(trimmed);
+            }
+        } catch (NumberFormatException ignored) {
+
         }
 
         throw new ConversionFailedException(sourceType, targetType, source);
