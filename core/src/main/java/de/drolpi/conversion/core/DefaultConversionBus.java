@@ -17,8 +17,10 @@
 package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.impl.ArrayToArrayConverter;
+import de.drolpi.conversion.core.impl.ArrayToCollectionConverter;
 import de.drolpi.conversion.core.impl.BooleanToIntegerConverter;
 import de.drolpi.conversion.core.impl.CharacterToNumberConverter;
+import de.drolpi.conversion.core.impl.CollectionToArrayConverter;
 import de.drolpi.conversion.core.impl.CollectionToCollectionConverter;
 import de.drolpi.conversion.core.impl.EnumToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToStringConverter;
@@ -101,6 +103,8 @@ class DefaultConversionBus extends BasicConversionBus {
         // Collection converters
         bus.register(new MapToMapConverter(bus));
         bus.register(new CollectionToCollectionConverter(bus));
+        bus.register(new CollectionToArrayConverter(bus));
+        bus.register(new ArrayToCollectionConverter(bus));
         bus.register(new ArrayToArrayConverter(bus));
     }
 }

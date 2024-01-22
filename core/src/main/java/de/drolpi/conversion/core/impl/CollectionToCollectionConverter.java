@@ -17,6 +17,8 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
+import de.drolpi.conversion.core.util.CollectionUtil;
+import de.drolpi.conversion.core.util.ConversionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,41 +51,12 @@ public final class CollectionToCollectionConverter extends AbstractCollectionCon
 
     @Override
     protected Type elementType(final Type type) {
-        if (!(type instanceof ParameterizedType parameterizedType)) {
-            return null;
-        }
-
-        final Type[] typeArgs = parameterizedType.getActualTypeArguments();
-        if (typeArgs.length != 1) {
-            return null;
-        }
-
-        return typeArgs[0];
-
+        return ConversionUtil.elementType(type, 1);
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
     protected Collection<Object> createNew(Class<?> type, Class<?> elementType, int length) {
-        if (LinkedHashSet.class == type || HashSet.class == type
-            || Set.class == type || Collection.class == type
-        ) {
-            return new LinkedHashSet<>(length);
-        } else if (LinkedList.class == type) {
-            return new LinkedList<>();
-        } else if (TreeSet.class == type || NavigableSet.class == type
-            || SortedSet.class == type
-        ) {
-            return new TreeSet<>();
-        } else if (EnumSet.class.isAssignableFrom(type)) {
-            if (!Enum.class.isAssignableFrom(elementType)) {
-                throw new IllegalArgumentException("Supplied type is not an enum: " + elementType.getName());
-            }
-
-            return EnumSet.noneOf(elementType.<Enum>asSubclass(Enum.class));
-        }
-
-        return new ArrayList<>();
+        return CollectionUtil.createCollection(type, elementType, length);
     }
 
     @Override

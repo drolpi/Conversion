@@ -22,6 +22,7 @@ import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.core.exception.ConversionFailedException;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
 import de.drolpi.conversion.core.util.ClassTreeUtil;
+import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -171,10 +172,6 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
         @Override
         public boolean isSuitable(@NotNull final Type sourceType, @NotNull final Type targetType) {
-            if (this.path.targetType() != targetType) {
-                return false;
-            }
-
             return !(this.converter instanceof ConditionalConverter conditionalConverter) ||
                 conditionalConverter.isSuitable(sourceType, targetType);
         }
@@ -223,13 +220,13 @@ class BasicConversionBus implements ConfigurableConversionBus {
             requireNonNull(sourceType, "sourceType");
             requireNonNull(targetType, "targetType");
             // Search the full type tree
-            final List<Class<?>> sourceTree = ClassTreeUtil.collect(sourceType);
-            final List<Class<?>> targetTree = ClassTreeUtil.collect(targetType);
+            final List<Class<?>> sourceTree = ClassTreeUtil.collect(GenericTypeReflector.box(sourceType));
+            final List<Class<?>> targetTree = ClassTreeUtil.collect(GenericTypeReflector.box(targetType));
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
                     final NonGenericConverter.ConversionPath path = new NonGenericConverter.ConversionPath(sourceCandidate, targetCandidate);
-                    final NonGenericConverter converter = this.converter(path);
+                    final NonGenericConverter converter = this.converter(sourceType, targetType, path);
 
                     if (converter != null) {
                         return converter;
@@ -240,14 +237,18 @@ class BasicConversionBus implements ConfigurableConversionBus {
             return null;
         }
 
-        private NonGenericConverter converter(@NotNull final NonGenericConverter.ConversionPath path) {
+        private NonGenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType,
+            @NotNull final NonGenericConverter.ConversionPath path
+        ) {
+            requireNonNull(sourceType, "sourceType");
+            requireNonNull(targetType, "targetType");
             requireNonNull(path, "path");
             // Check specifically registered converters
             final Deque<NonGenericConverter> convertersForPath = this.converters.get(path);
 
             if (convertersForPath != null) {
                 for (final NonGenericConverter converter : convertersForPath) {
-                    if (!converter.isSuitable(path.sourceType(), path.targetType())) {
+                    if (!converter.isSuitable(sourceType, targetType)) {
                         continue;
                     }
                     return converter;
@@ -256,7 +257,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
             // Check ConditionalConverters for a dynamic match
             for (final NonGenericConverter converter : this.globalConverters) {
-                if (converter.isSuitable(path.sourceType(), path.targetType())) {
+                if (converter.isSuitable(sourceType, targetType)) {
                     return converter;
                 }
             }

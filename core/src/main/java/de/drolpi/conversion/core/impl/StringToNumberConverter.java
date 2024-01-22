@@ -28,22 +28,26 @@ public final class StringToNumberConverter implements Converter<String, Number> 
 
     @Override
     public Number convert(String source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
         final String trimmed = source.trim();
 
         try {
-            if (Byte.class == targetType) {
+            if (Byte.class == targetType || byte.class == targetType) {
                 return (this.isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));
-            } else if (Short.class == targetType) {
+            } else if (Short.class == targetType || short.class == targetType) {
                 return (this.isHexNumber(trimmed) ? Short.decode(trimmed) : Short.valueOf(trimmed));
-            } else if (Integer.class == targetType) {
+            } else if (Integer.class == targetType || int.class == targetType) {
                 return (this.isHexNumber(trimmed) ? Integer.decode(trimmed) : Integer.valueOf(trimmed));
-            } else if (Long.class == targetType) {
+            } else if (Long.class == targetType || long.class == targetType) {
                 return (this.isHexNumber(trimmed) ? Long.decode(trimmed) : Long.valueOf(trimmed));
             } else if (BigInteger.class == targetType) {
                 return (this.isHexNumber(trimmed) ? this.decodeBigInteger(trimmed) : new BigInteger(trimmed));
-            } else if (Float.class == targetType) {
+            } else if (Float.class == targetType || float.class == targetType) {
                 return Float.valueOf(trimmed);
-            } else if (Double.class == targetType) {
+            } else if (Double.class == targetType || double.class == targetType) {
                 return Double.valueOf(trimmed);
             } else if (BigDecimal.class == targetType || Number.class == targetType) {
                 return new BigDecimal(trimmed);

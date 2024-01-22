@@ -18,22 +18,18 @@ package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
+import de.drolpi.conversion.core.util.CollectionUtil;
+import de.drolpi.conversion.core.util.ConversionUtil;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 @SuppressWarnings("ClassCanBeRecord")
 public final class MapToMapConverter implements NonGenericConverter {
@@ -46,8 +42,8 @@ public final class MapToMapConverter implements NonGenericConverter {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        final Type[] sourceElementTypes = this.elementTypes(sourceType);
-        final Type[] targetElementTypes = this.elementTypes(targetType);
+        final Type[] sourceElementTypes = ConversionUtil.elementTypes(sourceType, 2);
+        final Type[] targetElementTypes = ConversionUtil.elementTypes(targetType, 2);
 
         if (sourceElementTypes == null || targetElementTypes == null) {
             return false;
@@ -72,19 +68,25 @@ public final class MapToMapConverter implements NonGenericConverter {
             return sourceMap;
         }
 
-        final Type[] targetParams = this.elementTypes(targetType);
+        final Type[] targetParams = ConversionUtil.elementTypes(targetType, 2);
         final List<Map.Entry<Object, Object>> targetEntries = new ArrayList<>(sourceMap.size());
 
-        for (final Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
-            final Object sourceKey = entry.getKey();
-            final Object sourceValue = entry.getValue();
+        if (targetParams == null) {
+            for (final Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
+                targetEntries.add(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()));
+            }
+        } else {
+            for (final Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
+                final Object sourceKey = entry.getKey();
+                final Object sourceValue = entry.getValue();
 
-            final Object targetKey = this.conversionBus.convert(sourceKey, targetParams[1]);
-            final Object targetValue = this.conversionBus.convert(targetKey, targetParams[1]);
-            targetEntries.add(new AbstractMap.SimpleEntry<>(targetKey, targetValue));
+                final Object targetKey = this.conversionBus.convert(sourceKey, targetParams[1]);
+                final Object targetValue = this.conversionBus.convert(targetKey, targetParams[1]);
+                targetEntries.add(new AbstractMap.SimpleEntry<>(targetKey, targetValue));
 
-            if (sourceKey != targetKey || sourceValue != targetValue) {
-                copyRequired = true;
+                if (sourceKey != targetKey || sourceValue != targetValue) {
+                    copyRequired = true;
+                }
             }
         }
 
@@ -92,7 +94,7 @@ public final class MapToMapConverter implements NonGenericConverter {
             return sourceMap;
         }
 
-        final Map<Object, Object> targetMap = this.createMap(erasedTargetType, GenericTypeReflector.erase(targetParams[0]), sourceMap.size());
+        final Map<Object, Object> targetMap = CollectionUtil.createMap(targetType, targetParams != null ? targetParams[0] : null, sourceMap.size());
 
         for (final Map.Entry<Object, Object> entry : targetEntries) {
             targetMap.put(entry.getKey(), entry.getValue());
@@ -106,36 +108,5 @@ public final class MapToMapConverter implements NonGenericConverter {
         return Set.of(
             new ConversionPath(Map.class, Map.class)
         );
-    }
-
-    private @Nullable Type[] elementTypes(final Type type) {
-        if (!(type instanceof final ParameterizedType parameterizedType)) {
-            return null;
-        }
-
-        final Type[] typeArgs = parameterizedType.getActualTypeArguments();
-        if (typeArgs.length != 2) {
-            return null;
-        }
-
-        return typeArgs;
-
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private Map<Object, Object> createMap(final Class<?> mapType, final Class<?> keyType, final int capacity) {
-        if (EnumMap.class == mapType) {
-            if (!Enum.class.isAssignableFrom(keyType)) {
-                throw new IllegalArgumentException("Supplied type is not an enum: " + keyType.getName());
-            }
-
-            return new EnumMap(keyType.asSubclass(Enum.class));
-        }
-
-        if (SortedMap.class == mapType || NavigableMap.class == mapType) {
-            return new TreeMap<>();
-        }
-
-        return new LinkedHashMap<>(capacity);
     }
 }
