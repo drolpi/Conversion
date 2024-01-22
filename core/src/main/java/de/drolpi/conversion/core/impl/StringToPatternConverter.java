@@ -25,9 +25,8 @@ import java.util.regex.Pattern;
 public final class StringToPatternConverter implements Converter<String, Pattern> {
 
     @Override
-    public @NotNull Pattern convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public Pattern convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
         if (source.isEmpty()) {
-            // TODO: Enable null
             return null;
         }
         return Pattern.compile(source);
