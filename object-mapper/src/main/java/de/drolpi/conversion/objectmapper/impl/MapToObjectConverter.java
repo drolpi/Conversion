@@ -18,11 +18,9 @@ package de.drolpi.conversion.objectmapper.impl;
 
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.objectmapper.ObjectMapper;
-import io.leangen.geantyref.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
@@ -33,18 +31,22 @@ public final class MapToObjectConverter extends AbstractObjectMappingConverter i
         super(factory);
     }
 
+    @Override
+    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        return this.isMapSuitable(sourceType);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
         final Map<String, Object> sourceMap = (Map<String, Object>) source;
         final ObjectMapper<Object> objectMapper = (ObjectMapper<Object>) this.factory.get(targetType);
 
         return objectMapper.load(sourceMap);
-    }
-
-    @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return this.isMapSuitable(sourceType);
     }
 
     @Override

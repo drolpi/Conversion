@@ -42,11 +42,6 @@ public final class ArrayToArrayConverter extends AbstractCollectionConverter<Obj
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return true;
-    }
-
-    @Override
     public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
         return super.convert(toObjectArray(source), sourceType, targetType);
     }

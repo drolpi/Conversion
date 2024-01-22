@@ -35,6 +35,18 @@ public abstract class AbstractCollectionConverter<T> implements NonGenericConver
         this.conversionBus = conversionBus;
     }
 
+    @Override
+    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        final Type sourceParams = this.elementType(sourceType);
+        final Type targetParams = this.elementType(targetType);
+
+        if (sourceParams == null || targetParams == null) {
+            return false;
+        }
+
+        return this.conversionBus.canConvert(sourceParams, targetParams);
+    }
+
     @SuppressWarnings("unchecked")
     public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
         if (source == null) {

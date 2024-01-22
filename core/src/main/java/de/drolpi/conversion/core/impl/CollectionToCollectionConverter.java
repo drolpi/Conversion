@@ -41,11 +41,6 @@ public final class CollectionToCollectionConverter extends AbstractCollectionCon
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return true;
-    }
-
-    @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
             new ConversionPath(Collection.class, Collection.class)

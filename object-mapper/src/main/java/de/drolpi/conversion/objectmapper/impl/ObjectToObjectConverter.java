@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,19 +32,23 @@ public final class ObjectToObjectConverter extends AbstractObjectMappingConverte
         super(factory);
     }
 
+    @Override
+    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        return true;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
         final ObjectMapper<Object> sourceMapper = (ObjectMapper<Object>) this.factory.get(sourceType);
         final ObjectMapper<Object> targetMapper = (ObjectMapper<Object>) this.factory.get(targetType);
 
         final Map<String, Object> map = sourceMapper.save(source);
         return targetMapper.load(map);
-    }
-
-    @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return true;
     }
 
     @Override

@@ -31,17 +31,21 @@ public final class ObjectToMapConverter extends AbstractObjectMappingConverter i
         super(factory);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        final ObjectMapper<Object> objectMapper = (ObjectMapper<Object>) this.factory.get(sourceType);
-
-        return objectMapper.save(source);
-    }
-
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
         return this.isMapSuitable(targetType);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
+        final ObjectMapper<Object> objectMapper = (ObjectMapper<Object>) this.factory.get(sourceType);
+
+        return objectMapper.save(source);
     }
 
     @Override

@@ -53,9 +53,8 @@ public final class MapToMapConverter implements NonGenericConverter {
             return false;
         }
 
-        return true;
-        //return this.conversionBus.canConvert(sourceElementTypes[0], targetElementTypes[0])
-        //    && this.conversionBus.canConvert(sourceElementTypes[1], targetElementTypes[1]);
+        return this.conversionBus.canConvert(sourceElementTypes[0], targetElementTypes[0])
+            && this.conversionBus.canConvert(sourceElementTypes[1], targetElementTypes[1]);
     }
 
     @SuppressWarnings("unchecked")
