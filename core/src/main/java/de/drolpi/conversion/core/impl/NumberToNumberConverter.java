@@ -31,22 +31,22 @@ public final class NumberToNumberConverter implements Converter<Number, Number> 
 
     @Override
     public Number convert(Number source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if (Byte.class == targetType) {
+        if (Byte.class == targetType || byte.class == targetType) {
             final long value = this.convertToLong(source, sourceType, targetType);
             if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
                 return source.byteValue();
             }
-        } else if (Short.class == targetType) {
+        } else if (Short.class == targetType || short.class == targetType) {
             final long value = this.convertToLong(source, sourceType, targetType);
             if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE) {
                 return source.shortValue();
             }
-        } else if (Integer.class == targetType) {
+        } else if (Integer.class == targetType || int.class == targetType) {
             final long value = this.convertToLong(source, sourceType, targetType);
             if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) {
                 return source.intValue();
             }
-        } else if (Long.class == targetType) {
+        } else if (Long.class == targetType || long.class == targetType) {
             return this.convertToLong(source, sourceType, targetType);
         } else if (BigInteger.class == targetType) {
             if (source instanceof BigDecimal bigDecimal) {
@@ -54,9 +54,9 @@ public final class NumberToNumberConverter implements Converter<Number, Number> 
             } else {
                 return BigInteger.valueOf(source.longValue());
             }
-        } else if (Float.class == targetType) {
+        } else if (Float.class == targetType || float.class == targetType) {
             return source.floatValue();
-        } else if (Double.class == targetType) {
+        } else if (Double.class == targetType || double.class == targetType) {
             return source.doubleValue();
         } else if (BigDecimal.class == targetType) {
             return new BigDecimal(source.toString());
