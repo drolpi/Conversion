@@ -18,7 +18,6 @@ package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
-import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,17 +39,24 @@ public final class ObjectToOptionalConverter implements NonGenericConverter {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        //TODO:
-        return true;
+        if (!(targetType instanceof final ParameterizedType parameterizedSourceType)) {
+            return true;
+        }
+
+        return this.conversionBus.canConvert(sourceType, parameterizedSourceType.getActualTypeArguments()[0]);
     }
 
     @Override
-    public Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @NotNull Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return Optional.empty();
-        } else if (source instanceof Optional) {
+        }
+
+        if (source instanceof Optional) {
             return source;
-        } else if (targetType instanceof ParameterizedType parameterizedType && parameterizedType.getActualTypeArguments().length == 1) {
+        }
+
+        if (targetType instanceof ParameterizedType parameterizedType && parameterizedType.getActualTypeArguments().length == 1) {
             Object target = this.conversionBus.convert(source, parameterizedType.getActualTypeArguments()[0]);
             if (target == null || (target.getClass().isArray() && Array.getLength(target) == 0) ||
                 (target instanceof Collection<?> collection && collection.isEmpty())

@@ -97,6 +97,13 @@ class BasicConversionBus implements ConfigurableConversionBus {
     }
 
     @Override
+    public boolean canConvert(@NotNull final Type sourceType, @NotNull final Type targetType) {
+        requireNonNull(sourceType, "sourceType");
+        requireNonNull(targetType, "targetType");
+        return this.converter(sourceType, targetType) != null;
+    }
+
+    @Override
     public Object convert(@Nullable final Object source, @NotNull final Type targetType) {
         requireNonNull(targetType, "targetType");
         final Class<?> sourceType = source == null ? Object.class : source.getClass();

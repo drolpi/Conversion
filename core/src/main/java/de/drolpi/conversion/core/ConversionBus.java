@@ -46,10 +46,19 @@ public interface ConversionBus {
     }
 
     /**
+     * Returns whether this conversion bus can convert objects of {@code sourceType} to the {@code targetType}.
+     *
+     * @param sourceType the source type to convert from
+     * @param targetType the target type to convert to
+     * @return true, if this conversion bus can convert, false, if not
+     */
+    boolean canConvert(@NotNull Type sourceType, @NotNull Type targetType);
+
+    /**
      * Converts the given {@code source} to the specified {@code targetType}.
      *
-     * @param source the source object to convert (maybe {@code null})
-     * @param targetType the target type as {@link Type} to convert to (required)
+     * @param source the source object to convert
+     * @param targetType the target type as {@link Type} to convert to
      * @return the converted object, an instance of targetType
      */
     @Nullable Object convert(@Nullable Object source, @NotNull Type targetType);
@@ -57,8 +66,8 @@ public interface ConversionBus {
     /**
      * Converts the given {@code source} to the specified {@code targetType}.
      *
-     * @param source the source object to convert (maybe {@code null})
-     * @param targetType the target type as {@link Class} to convert to (required)
+     * @param source the source object to convert
+     * @param targetType the target type as {@link Class} to convert to
      * @return the converted object, an instance of targetType
      */
     @SuppressWarnings("unchecked")
@@ -70,8 +79,8 @@ public interface ConversionBus {
     /**
      * Converts the given {@code source} to the specified {@code targetType}.
      *
-     * @param source the source object to convert (maybe {@code null})
-     * @param targetType the target type as {@link TypeToken} to convert to (required)
+     * @param source the source object to convert
+     * @param targetType the target type as {@link TypeToken} to convert to
      * @return the converted object, an instance of targetType
      */
     @SuppressWarnings("unchecked")

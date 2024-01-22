@@ -21,6 +21,7 @@ import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.Set;
@@ -36,8 +37,13 @@ public final class OptionalToObjectConverter implements NonGenericConverter {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        //TODO:
-        return true;
+        Type source = Object.class;
+
+        if (sourceType instanceof final ParameterizedType parameterizedType) {
+            source = parameterizedType.getActualTypeArguments()[0];
+        }
+
+        return this.conversionBus.canConvert(source, targetType);
     }
 
     @SuppressWarnings("unchecked")
