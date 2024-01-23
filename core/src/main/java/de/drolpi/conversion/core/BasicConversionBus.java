@@ -120,6 +120,8 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
     private @Nullable NonGenericConverter converter(@NotNull final Type sourceType, @NotNull final Type targetType) {
         final CacheKey cacheKey = new CacheKey(sourceType, targetType);
+        final Class<?> erasedSourceType = GenericTypeReflector.erase(sourceType);
+        final Class<?> erasedTargetType = GenericTypeReflector.erase(targetType);
 
         // Take a look at the cache to see if this conversion has been done before
         NonGenericConverter converter = this.cache.get(cacheKey);
@@ -133,7 +135,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
         converter = this.registrar.find(sourceType, targetType);
 
         // Check whether a conversion is necessary at all
-        if (converter == null && sourceType == targetType) {
+        if (converter == null && erasedTargetType.isAssignableFrom(erasedSourceType)) {
             // Use a non-operating converter
             converter = NO_OP_CONVERTER;
         }
@@ -298,9 +300,6 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
         @Override
         public Object convert(final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
-            if (sourceType != targetType) {
-                throw new ConversionFailedException(sourceType, sourceType, targetType);
-            }
             return source;
         }
     }

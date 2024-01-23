@@ -39,7 +39,8 @@ public final class ArrayToCollectionConverter implements NonGenericConverter {
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return ConversionUtil.canConvertElements(sourceType, targetType, this.conversionBus);
+        return ConversionUtil.canConvertElements(ConversionUtil.elementType(sourceType, 1), ConversionUtil.elementType(targetType, 1),
+            this.conversionBus);
     }
 
     @Override
@@ -53,17 +54,10 @@ public final class ArrayToCollectionConverter implements NonGenericConverter {
         final int length = Array.getLength(source);
         final Collection<Object> target = CollectionUtil.createCollection(targetType, targetElementType, length);
 
-        if (targetElementType == null) {
-            for (int i = 0; i < length; i++) {
-                final Object sourceElement = Array.get(source, i);
-                target.add(sourceElement);
-            }
-        } else {
-            for (int i = 0; i < length; i++) {
-                final Object sourceElement = Array.get(source, i);
-                final Object targetElement = this.conversionBus.convert(sourceElement, targetElementType);
-                target.add(targetElement);
-            }
+        for (int i = 0; i < length; i++) {
+            final Object sourceElement = Array.get(source, i);
+            final Object targetElement = this.conversionBus.convert(sourceElement, targetElementType);
+            target.add(targetElement);
         }
         return target;
     }

@@ -27,11 +27,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public abstract class AbstractCollectionConverter<T> implements NonGenericConverter {
+public abstract class AbstractElementToElementConverter<T> implements NonGenericConverter {
 
     private final ConversionBus conversionBus;
 
-    public AbstractCollectionConverter(ConversionBus conversionBus) {
+    public AbstractElementToElementConverter(ConversionBus conversionBus) {
         this.conversionBus = conversionBus;
     }
 

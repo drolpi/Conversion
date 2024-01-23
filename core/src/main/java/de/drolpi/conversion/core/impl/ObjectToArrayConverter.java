@@ -17,50 +17,28 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
-import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.Set;
-import java.util.function.Consumer;
 
-public final class ArrayToArrayConverter extends AbstractElementToElementConverter<Object> {
+public final class ObjectToArrayConverter extends AbstractObjectToElementConverter<Object> {
 
-    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
-
-    public ArrayToArrayConverter(ConversionBus conversionBus) {
+    public ObjectToArrayConverter(ConversionBus conversionBus) {
         super(conversionBus);
     }
 
     @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
-            new ConversionPath(Object[].class, Object[].class)
+            new ConversionPath(Object.class, Object[].class)
         );
     }
 
     @Override
-    protected Type elementType(Type containerType) {
-        return GenericTypeReflector.getArrayComponentType(containerType);
-    }
-
-    @Override
-    protected Object createNew(Class<?> type, Class<?> elementType, int length) {
-        return Array.newInstance(GenericTypeReflector.erase(elementType), length);
-    }
-
-    @Override
-    protected int size(Object collection) {
-        return Array.getLength(collection);
-    }
-
-    @Override
-    protected void forEachElement(Object collection, Consumer<Object> consumer) {
-        for (int i = 0; i < Array.getLength(collection); i++) {
-            consumer.accept(Array.get(collection, i));
-        }
+    protected Object createNew(Class<?> type, Class<?> elementType) {
+        return Array.newInstance(elementType, 1);
     }
 
     @Override

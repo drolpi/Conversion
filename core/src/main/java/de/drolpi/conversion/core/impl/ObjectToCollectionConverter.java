@@ -18,48 +18,28 @@ package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.core.util.CollectionUtil;
-import de.drolpi.conversion.core.util.ConversionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.Consumer;
 
-public final class CollectionToCollectionConverter extends AbstractElementToElementConverter<Collection<Object>> {
+public final class ObjectToCollectionConverter extends AbstractObjectToElementConverter<Collection<Object>> {
 
-    public CollectionToCollectionConverter(ConversionBus conversionBus) {
+    public ObjectToCollectionConverter(ConversionBus conversionBus) {
         super(conversionBus);
     }
 
     @Override
     public @NotNull Set<ConversionPath> paths() {
         return Set.of(
-            new ConversionPath(Collection.class, Collection.class)
+            new ConversionPath(Object.class, Collection.class)
         );
     }
 
     @Override
-    protected Type elementType(final Type type) {
-        return ConversionUtil.elementType(type, 1);
-    }
-
-    @Override
-    protected Collection<Object> createNew(Class<?> type, Class<?> elementType, int length) {
-        return CollectionUtil.createCollection(type, elementType, length);
-    }
-
-    @Override
-    protected int size(Collection<Object> collection) {
-        return collection.size();
-    }
-
-    @Override
-    protected void forEachElement(Collection<Object> collection, Consumer<Object> consumer) {
-        for (Object element : collection) {
-            consumer.accept(element);
-        }
+    protected Collection<Object> createNew(Class<?> type, Class<?> elementType) {
+        return CollectionUtil.createCollection(type, elementType, 1);
     }
 
     @Override

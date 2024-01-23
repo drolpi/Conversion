@@ -18,6 +18,7 @@ package de.drolpi.conversion.core.util;
 
 import de.drolpi.conversion.core.ConversionBus;
 import io.leangen.geantyref.GenericTypeReflector;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -48,10 +49,10 @@ public final class ConversionUtil {
         return typeArgs;
     }
 
-    public static Type elementType(final Type type, int maxLength) {
+    public static @NotNull Type elementType(final Type type, int maxLength) {
         final Type[] types = elementTypes(type, maxLength);
         if (types == null) {
-            return null;
+            return Object.class;
         }
         return types[0];
     }
@@ -60,10 +61,10 @@ public final class ConversionUtil {
         final Type sourceElementType = elementType(sourceType, 1);
         final Type targetElementType = elementType(targetType, 1);
 
-        if (targetElementType == null) {
+        if (targetElementType == Object.class) {
             return true;
         }
-        if (sourceElementType == null) {
+        if (sourceElementType == Object.class) {
             return true;
         }
 

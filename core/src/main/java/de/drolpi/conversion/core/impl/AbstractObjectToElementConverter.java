@@ -23,23 +23,19 @@ import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Set;
 
-@SuppressWarnings("ClassCanBeRecord")
-public final class CollectionToArrayConverter implements NonGenericConverter {
+public abstract class AbstractObjectToElementConverter<T> implements NonGenericConverter {
 
     private final ConversionBus conversionBus;
 
-    public CollectionToArrayConverter(ConversionBus conversionBus) {
+    AbstractObjectToElementConverter(ConversionBus conversionBus) {
         this.conversionBus = conversionBus;
     }
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return ConversionUtil.canConvertElements(ConversionUtil.elementType(sourceType, 1), ConversionUtil.elementType(targetType, 1), this.conversionBus);
+        return ConversionUtil.canConvertElements(sourceType, ConversionUtil.elementType(targetType, 1), this.conversionBus);
     }
 
     @Override
@@ -48,22 +44,16 @@ public final class CollectionToArrayConverter implements NonGenericConverter {
             return null;
         }
 
-        final Collection<?> sourceCollection = (Collection<?>) source;
+        final Class<?> erasedTargetType = GenericTypeReflector.erase(targetType);
         final Type targetElementType = ConversionUtil.elementType(targetType, 1);
 
-        final Object array = Array.newInstance(GenericTypeReflector.erase(targetElementType), sourceCollection.size());
-        int i = 0;
-        for (final Object sourceElement : sourceCollection) {
-            final Object targetElement = this.conversionBus.convert(sourceElement, targetElementType);
-            Array.set(array, i++, targetElement);
-        }
-        return array;
+        final T target = this.createNew(erasedTargetType, GenericTypeReflector.erase(targetElementType));
+        final Object targetElement = this.conversionBus.convert(source, targetElementType);
+        this.add(0, target, targetElement);
+        return target;
     }
 
-    @Override
-    public @NotNull Set<ConversionPath> paths() {
-        return Set.of(
-            new ConversionPath(Collection.class, Object[].class)
-        );
-    }
+    protected abstract T createNew(Class<?> type, Class<?> elementType);
+
+    protected abstract void add(int index, T collection, @Nullable Object element);
 }

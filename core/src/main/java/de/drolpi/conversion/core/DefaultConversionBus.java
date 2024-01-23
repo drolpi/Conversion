@@ -18,10 +18,12 @@ package de.drolpi.conversion.core;
 
 import de.drolpi.conversion.core.impl.ArrayToArrayConverter;
 import de.drolpi.conversion.core.impl.ArrayToCollectionConverter;
+import de.drolpi.conversion.core.impl.ArrayToObjectConverter;
 import de.drolpi.conversion.core.impl.BooleanToIntegerConverter;
 import de.drolpi.conversion.core.impl.CharacterToNumberConverter;
 import de.drolpi.conversion.core.impl.CollectionToArrayConverter;
 import de.drolpi.conversion.core.impl.CollectionToCollectionConverter;
+import de.drolpi.conversion.core.impl.CollectionToObjectConverter;
 import de.drolpi.conversion.core.impl.EnumToIntegerConverter;
 import de.drolpi.conversion.core.impl.EnumToStringConverter;
 import de.drolpi.conversion.core.impl.IntegerToBooleanConverter;
@@ -29,6 +31,8 @@ import de.drolpi.conversion.core.impl.IntegerToEnumConverter;
 import de.drolpi.conversion.core.impl.MapToMapConverter;
 import de.drolpi.conversion.core.impl.NumberToCharacterConverter;
 import de.drolpi.conversion.core.impl.NumberToNumberConverter;
+import de.drolpi.conversion.core.impl.ObjectToArrayConverter;
+import de.drolpi.conversion.core.impl.ObjectToCollectionConverter;
 import de.drolpi.conversion.core.impl.ObjectToOptionalConverter;
 import de.drolpi.conversion.core.impl.ObjectToStringConverter;
 import de.drolpi.conversion.core.impl.OptionalToObjectConverter;
@@ -92,6 +96,7 @@ class DefaultConversionBus extends BasicConversionBus {
         bus.register(URI.class, String.class, new ObjectToStringConverter());
         bus.register(String.class, URI.class, new StringToUriConverter());
 
+        // Generic converters
         bus.register(new EnumToStringConverter());
         bus.register(new StringToEnumConverter());
         bus.register(new EnumToIntegerConverter());
@@ -103,8 +108,12 @@ class DefaultConversionBus extends BasicConversionBus {
         // Collection converters
         bus.register(new MapToMapConverter(bus));
         bus.register(new CollectionToCollectionConverter(bus));
+        bus.register(new CollectionToObjectConverter(bus));
+        bus.register(new ObjectToCollectionConverter(bus));
         bus.register(new CollectionToArrayConverter(bus));
         bus.register(new ArrayToCollectionConverter(bus));
+        bus.register(new ArrayToObjectConverter(bus));
+        bus.register(new ObjectToArrayConverter(bus));
         bus.register(new ArrayToArrayConverter(bus));
     }
 }

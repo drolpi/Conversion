@@ -23,47 +23,45 @@ import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Set;
 
-@SuppressWarnings("ClassCanBeRecord")
-public final class CollectionToArrayConverter implements NonGenericConverter {
+public abstract class AbstractElementToObjectConverter<T> implements NonGenericConverter {
 
     private final ConversionBus conversionBus;
 
-    public CollectionToArrayConverter(ConversionBus conversionBus) {
+    AbstractElementToObjectConverter(ConversionBus conversionBus) {
         this.conversionBus = conversionBus;
     }
 
     @Override
     public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return ConversionUtil.canConvertElements(ConversionUtil.elementType(sourceType, 1), ConversionUtil.elementType(targetType, 1), this.conversionBus);
+        return ConversionUtil.canConvertElements(ConversionUtil.elementType(sourceType, 1), targetType, this.conversionBus);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }
 
-        final Collection<?> sourceCollection = (Collection<?>) source;
-        final Type targetElementType = ConversionUtil.elementType(targetType, 1);
-
-        final Object array = Array.newInstance(GenericTypeReflector.erase(targetElementType), sourceCollection.size());
-        int i = 0;
-        for (final Object sourceElement : sourceCollection) {
-            final Object targetElement = this.conversionBus.convert(sourceElement, targetElementType);
-            Array.set(array, i++, targetElement);
+        final Class<?> erasedSourceType = GenericTypeReflector.erase(sourceType);
+        final Class<?> erasedTargetType = GenericTypeReflector.erase(targetType);
+        if (erasedSourceType.isAssignableFrom(erasedTargetType)) {
+            return source;
         }
-        return array;
+
+        final T sourceCollection = (T) source;
+        if (this.isEmpty(sourceCollection)) {
+            return null;
+        }
+
+        final Object element = this.firstElement(sourceCollection);
+        return this.conversionBus.convert(element, targetType);
     }
 
-    @Override
-    public @NotNull Set<ConversionPath> paths() {
-        return Set.of(
-            new ConversionPath(Collection.class, Object[].class)
-        );
-    }
+    protected abstract boolean isEmpty(T collection);
+
+    protected abstract Object firstElement(T collection);
 }
