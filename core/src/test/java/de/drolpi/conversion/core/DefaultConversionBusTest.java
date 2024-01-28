@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core.impl;
+package de.drolpi.conversion.core;
 
-import de.drolpi.conversion.core.converter.Converter;
-import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
+import static org.junit.jupiter.api.Assertions.*;
 
-public final class CharacterToNumberConverter implements Converter<Character, Number> {
+public class DefaultConversionBusTest {
 
-    private final NumberToNumberConverter helpConverter = new NumberToNumberConverter();
+    private final ConversionBus conversionBus = ConversionBus.createDefault();
 
-    @Override
-    public Number convert(@NotNull Character source, @NotNull Type sourceType, @NotNull Type targetType) {
-        return this.helpConverter.convert((short) source.charValue(), short.class, targetType);
+    @Test
+    void stringToCharacter() {
+        assertEquals(this.conversionBus.convert("1", Character.class), Character.valueOf('1'));
     }
 }

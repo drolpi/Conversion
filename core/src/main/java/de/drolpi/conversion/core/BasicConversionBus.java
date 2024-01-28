@@ -19,7 +19,6 @@ package de.drolpi.conversion.core;
 import de.drolpi.conversion.core.converter.ConditionalConverter;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
-import de.drolpi.conversion.core.exception.ConversionFailedException;
 import de.drolpi.conversion.core.exception.ConverterNotFoundException;
 import de.drolpi.conversion.core.util.ClassTreeUtil;
 import io.leangen.geantyref.GenericTypeReflector;
@@ -108,7 +107,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
     public Object convert(@Nullable final Object source, @NotNull final Type targetType) {
         requireNonNull(targetType, "targetType");
         final Class<?> sourceType = source == null ? Object.class : source.getClass();
-        final Converter<Object, Object> converter = this.converter(sourceType, targetType);
+        final NonGenericConverter converter = this.converter(sourceType, targetType);
 
         if (converter == null) {
             // No Converter found
@@ -179,7 +178,10 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         @Override
-        public @Nullable Object convert(@Nullable final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+        public @Nullable Object convert(final @Nullable Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+            if (source == null) {
+                return null;
+            }
             return this.converter.convert(source, sourceType, targetType);
         }
     }
@@ -299,7 +301,7 @@ class BasicConversionBus implements ConfigurableConversionBus {
         }
 
         @Override
-        public Object convert(final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+        public Object convert(final @Nullable Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
             return source;
         }
     }

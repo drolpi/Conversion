@@ -26,8 +26,12 @@ import java.util.Set;
 public final class EnumToStringConverter implements NonGenericConverter {
 
     @Override
-    public @Nullable Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if(!(source instanceof Enum<?> enumSource)) {
+    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
+        if (!(source instanceof Enum<?> enumSource)) {
             return null;
         }
 

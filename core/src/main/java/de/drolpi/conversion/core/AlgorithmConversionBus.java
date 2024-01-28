@@ -111,7 +111,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
     private record AlgorithmConverter(AlgorithmResult result) implements NonGenericConverter {
 
         @Override
-        public @Nullable Object convert(@Nullable final Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+        public @Nullable Object convert(final @Nullable Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
             requireNonNull(sourceType, "sourceType");
             requireNonNull(targetType, "targetType");
             // Iterate through all the possibilities to try them out

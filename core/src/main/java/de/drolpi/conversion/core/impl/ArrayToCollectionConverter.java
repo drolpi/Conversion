@@ -50,7 +50,6 @@ public final class ArrayToCollectionConverter implements NonGenericConverter {
         }
 
         final Type targetElementType = ConversionUtil.elementType(targetType, 1);
-
         final int length = Array.getLength(source);
         final Collection<Object> target = CollectionUtil.createCollection(targetType, targetElementType, length);
 

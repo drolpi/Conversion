@@ -30,7 +30,7 @@ public final class NumberToNumberConverter implements Converter<Number, Number> 
     private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
 
     @Override
-    public Number convert(Number source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public Number convert(@NotNull Number source, @NotNull Type sourceType, @NotNull Type targetType) {
         if (Byte.class == targetType || byte.class == targetType) {
             final long value = this.convertToLong(source, sourceType, targetType);
             if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {

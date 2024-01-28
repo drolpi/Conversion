@@ -27,11 +27,7 @@ import java.math.BigInteger;
 public final class StringToNumberConverter implements Converter<String, Number> {
 
     @Override
-    public Number convert(String source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if (source == null) {
-            return null;
-        }
-
+    public Number convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
         final String trimmed = source.trim();
 
         try {

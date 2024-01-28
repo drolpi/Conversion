@@ -27,6 +27,10 @@ public final class EnumToIntegerConverter implements NonGenericConverter {
 
     @Override
     public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
+
         if (!(source instanceof Enum<?> enumSource)) {
             return null;
         }

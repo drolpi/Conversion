@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -50,10 +51,10 @@ public final class CollectionToArrayConverter implements NonGenericConverter {
 
         final Collection<?> sourceCollection = (Collection<?>) source;
         final Type targetElementType = ConversionUtil.elementType(targetType, 1);
-
         final Object array = Array.newInstance(GenericTypeReflector.erase(targetElementType), sourceCollection.size());
-        int i = 0;
-        for (final Object sourceElement : sourceCollection) {
+
+        for (int i = 0; i < sourceCollection.size(); i++) {
+            final Object sourceElement = sourceCollection.iterator().next();
             final Object targetElement = this.conversionBus.convert(sourceElement, targetElementType);
             Array.set(array, i++, targetElement);
         }

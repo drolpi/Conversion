@@ -19,6 +19,7 @@ package de.drolpi.conversion.core.impl;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Set;
@@ -34,9 +35,12 @@ public final class StringToEnumConverter implements NonGenericConverter {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public Object convert(Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        final String identifier = (String) source;
+    public Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source == null) {
+            return null;
+        }
 
+        final String identifier = (String) source;
         try {
             int id = Integer.parseInt(identifier);
             return this.helpConverter.convert(id, int.class, targetType);
