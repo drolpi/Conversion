@@ -52,7 +52,7 @@ public interface ConversionBus {
      * @param targetType the target type to convert to
      * @return true, if this conversion bus can convert, false, if not
      */
-    boolean canConvert(@NotNull Type sourceType, @NotNull Type targetType);
+    boolean canConvert(@Nullable Type sourceType, @NotNull Type targetType);
 
     /**
      * Converts the given {@code source} to the specified {@code targetType}.
