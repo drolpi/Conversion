@@ -234,7 +234,6 @@ class BasicConversionBus implements ConfigurableConversionBus {
 
             for (final Class<?> targetCandidate : targetTree) {
                 for (final Class<?> sourceCandidate : sourceTree) {
-                    System.out.println(sourceCandidate + " - " + targetCandidate);
                     final ConversionPath path = new ConversionPath(sourceCandidate, targetCandidate);
                     final NonGenericConverter converter = this.converter(sourceType, targetType, path);
 
