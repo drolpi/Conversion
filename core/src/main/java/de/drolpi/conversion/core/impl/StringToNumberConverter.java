@@ -28,8 +28,11 @@ public final class StringToNumberConverter implements Converter<String, Number> 
 
     @Override
     public Number convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
-        final String trimmed = source.trim();
+        if (source.isEmpty()) {
+            return null;
+        }
 
+        final String trimmed = source.trim();
         try {
             if (Byte.class == targetType || byte.class == targetType) {
                 return (this.isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));

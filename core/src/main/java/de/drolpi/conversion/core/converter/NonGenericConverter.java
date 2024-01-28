@@ -25,23 +25,7 @@ import java.util.Set;
 public interface NonGenericConverter extends ConditionalConverter<Object, Object> {
 
     @Override
-    @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType);
+    @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType);
 
     @NotNull Set<ConversionPath> paths();
-
-    record ConversionPath(@NotNull Class<?> sourceType, @NotNull Class<?> targetType) {
-
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) {
-                return true;
-            }
-
-            if (!(other instanceof ConversionPath otherPath)) {
-                return false;
-            }
-
-            return (this.sourceType.equals(otherPath.sourceType) && this.targetType.equals(otherPath.targetType));
-        }
-    }
 }

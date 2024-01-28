@@ -19,13 +19,18 @@ package de.drolpi.conversion.core.impl;
 import de.drolpi.conversion.core.converter.Converter;
 import de.drolpi.conversion.core.exception.ConversionFailedException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
 public final class StringToCharacterConverter implements Converter<String, Character> {
 
     @Override
-    public @NotNull Character convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Character convert(@NotNull String source, @NotNull Type sourceType, @NotNull Type targetType) {
+        if (source.isEmpty()) {
+            return null;
+        }
+
         if (source.length() == 1) {
             return source.charAt(0);
         }

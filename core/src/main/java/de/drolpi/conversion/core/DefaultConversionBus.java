@@ -41,6 +41,7 @@ import de.drolpi.conversion.core.impl.StringToCharacterConverter;
 import de.drolpi.conversion.core.impl.StringToCurrencyConverter;
 import de.drolpi.conversion.core.impl.StringToEnumConverter;
 import de.drolpi.conversion.core.impl.StringToNumberConverter;
+import de.drolpi.conversion.core.impl.StringToPatternConverter;
 import de.drolpi.conversion.core.impl.StringToUriConverter;
 import de.drolpi.conversion.core.impl.StringToUrlConverter;
 import de.drolpi.conversion.core.impl.StringToUuidConverter;
@@ -87,6 +88,7 @@ class DefaultConversionBus extends BasicConversionBus {
         bus.register(String.class, UUID.class, new StringToUuidConverter());
 
         bus.register(Pattern.class, String.class, new ObjectToStringConverter());
+        bus.register(String.class, Pattern.class, new StringToPatternConverter());
 
         bus.register(Locale.class, String.class, new ObjectToStringConverter());
 

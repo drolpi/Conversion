@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.converter;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
@@ -32,6 +33,6 @@ public interface ConverterCondition {
      * @param targetType the target type we are converting to
      * @return true, if this condition is true, false if not
      */
-    boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType);
+    boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType);
 
 }

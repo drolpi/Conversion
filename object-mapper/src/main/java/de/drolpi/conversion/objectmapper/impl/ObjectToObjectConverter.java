@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.objectmapper.impl;
 
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.objectmapper.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -32,14 +33,14 @@ public final class ObjectToObjectConverter extends AbstractObjectMappingConverte
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         return true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if (source == null) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
+        if (source == null || sourceType == null) {
             return null;
         }
 

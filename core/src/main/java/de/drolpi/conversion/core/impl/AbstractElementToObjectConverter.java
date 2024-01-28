@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
 
 public abstract class AbstractElementToObjectConverter<T> implements NonGenericConverter {
 
@@ -35,14 +34,14 @@ public abstract class AbstractElementToObjectConverter<T> implements NonGenericC
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         return ConversionUtil.canConvertElements(ConversionUtil.elementType(sourceType, 1), targetType, this.conversionBus);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
-        if (source == null) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
+        if (source == null || sourceType == null) {
             return null;
         }
 

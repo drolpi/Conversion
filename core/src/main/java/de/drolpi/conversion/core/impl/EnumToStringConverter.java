@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.core.impl;
 
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,7 @@ import java.util.Set;
 public final class EnumToStringConverter implements NonGenericConverter {
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }
@@ -39,7 +40,7 @@ public final class EnumToStringConverter implements NonGenericConverter {
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         return true;
     }
 

@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.core;
 
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.core.exception.ConversionFailedException;
 import de.drolpi.conversion.core.util.ClassTreeUtil;
@@ -43,8 +44,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
     private static final class AlgorithmConverterRegistrar extends ConverterRegistrar {
 
         @Override
-        protected NonGenericConverter find(@NotNull final Type sourceType, @NotNull final Type targetType) {
-            requireNonNull(sourceType, "sourceType");
+        protected NonGenericConverter find(@Nullable final Type sourceType, @NotNull final Type targetType) {
             requireNonNull(targetType, "targetType");
             // Try to find an explicitly registered converter
             final NonGenericConverter converter = super.find(sourceType, targetType);
@@ -54,7 +54,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
 
             final AlgorithmResult result = new AlgorithmResult();
             final AlgorithmPath emptyPath = new AlgorithmPath();
-            this.algorithm(sourceType, targetType, emptyPath, result);
+            this.algorithm(sourceType != null ? sourceType : Object.class, targetType, emptyPath, result);
 
             if (result.isEmpty()) {
                 return null;
@@ -73,8 +73,8 @@ class AlgorithmConversionBus extends BasicConversionBus {
             // Iterate through the whole class tree to find a converter with a matching source type
             for (final Class<?> sourceCandidate : sourceTree) {
                 // Iterate through all registered converters
-                for (final Map.Entry<NonGenericConverter.ConversionPath, Deque<NonGenericConverter>> entry : this.converters.entrySet()) {
-                    final NonGenericConverter.ConversionPath path = entry.getKey();
+                for (final Map.Entry<ConversionPath, Deque<NonGenericConverter>> entry : this.converters.entrySet()) {
+                    final ConversionPath path = entry.getKey();
                     // Skip if the source type does not match
                     if (path.sourceType() != sourceCandidate) {
                         continue;
@@ -111,7 +111,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
     private record AlgorithmConverter(AlgorithmResult result) implements NonGenericConverter {
 
         @Override
-        public @Nullable Object convert(final @Nullable Object source, @NotNull final Type sourceType, @NotNull final Type targetType) {
+        public @Nullable Object convert(final @Nullable Object source, final @Nullable Type sourceType, @NotNull final Type targetType) {
             requireNonNull(sourceType, "sourceType");
             requireNonNull(targetType, "targetType");
             // Iterate through all the possibilities to try them out
@@ -136,7 +136,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
 
                 // Iterate through all possible converters of the way to check their conditions
                 for (final NonGenericConverter nonGenericConverter : converterDeque) {
-                    final Type sourceT = result == null ? Object.class : result.getClass();
+                    final Type sourceT = result != null ? result.getClass() : Object.class;
                     Type targetT = targetType;
                     boolean suitable = false;
 
@@ -169,7 +169,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
         }
 
         @Override
-        public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+        public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
             return true;
         }
     }

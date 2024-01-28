@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.core.impl;
 
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
@@ -24,16 +25,16 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-public class IntegerToEnumConverter implements NonGenericConverter {
+public final class IntegerToEnumConverter implements NonGenericConverter {
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
-        return false;
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
+        return true;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }

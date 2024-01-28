@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.util.CollectionUtil;
 import de.drolpi.conversion.core.util.ConversionUtil;
 import org.jetbrains.annotations.NotNull;

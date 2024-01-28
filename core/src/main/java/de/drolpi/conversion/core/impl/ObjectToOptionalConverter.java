@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,7 @@ public final class ObjectToOptionalConverter implements NonGenericConverter {
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         if (!(targetType instanceof final ParameterizedType parameterizedSourceType)) {
             return true;
         }
@@ -47,7 +48,7 @@ public final class ObjectToOptionalConverter implements NonGenericConverter {
     }
 
     @Override
-    public @NotNull Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @NotNull Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return Optional.empty();
         }

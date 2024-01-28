@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import de.drolpi.conversion.core.util.CollectionUtil;
 import de.drolpi.conversion.core.util.ConversionUtil;
@@ -41,7 +42,7 @@ public final class MapToMapConverter implements NonGenericConverter {
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         final Type[] sourceElementTypes = ConversionUtil.elementTypes(sourceType, 2);
         final Type[] targetElementTypes = ConversionUtil.elementTypes(targetType, 2);
 
@@ -55,7 +56,7 @@ public final class MapToMapConverter implements NonGenericConverter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }

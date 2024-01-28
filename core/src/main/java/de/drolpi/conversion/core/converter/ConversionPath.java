@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package de.drolpi.conversion.core;
+package de.drolpi.conversion.core.converter;
 
-import org.junit.jupiter.api.Test;
+public record ConversionPath(Class<?> sourceType, Class<?> targetType) {
 
-import static org.junit.jupiter.api.Assertions.*;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
 
-public class DefaultConversionBusTest {
+        if (!(other instanceof ConversionPath otherPath)) {
+            return false;
+        }
 
-    private final ConversionBus conversionBus = ConversionBus.createDefault();
-
-    @Test
-    void stringToCharacter() {
-        assertEquals(this.conversionBus.convert("1", Character.class), Character.valueOf('1'));
+        return (this.sourceType == null || otherPath.sourceType == null || this.sourceType.equals(otherPath.sourceType))
+            && this.targetType.equals(otherPath.targetType);
     }
 }

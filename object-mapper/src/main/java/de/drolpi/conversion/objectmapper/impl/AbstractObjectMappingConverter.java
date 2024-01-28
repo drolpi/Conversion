@@ -17,7 +17,7 @@
 package de.drolpi.conversion.objectmapper.impl;
 
 import de.drolpi.conversion.objectmapper.ObjectMapper;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -30,7 +30,11 @@ public abstract class AbstractObjectMappingConverter {
         this.factory = factory;
     }
 
-    protected boolean isMapSuitable(@NotNull Type type) {
+    protected boolean isMapSuitable(@Nullable Type type) {
+        if (type == null) {
+            return false;
+        }
+
         if (!(type instanceof ParameterizedType parameterizedType)) {
             //TODO: is this unsafe?
             return true;

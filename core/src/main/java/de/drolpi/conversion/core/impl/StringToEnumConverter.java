@@ -16,6 +16,7 @@
 
 package de.drolpi.conversion.core.impl;
 
+import de.drolpi.conversion.core.converter.ConversionPath;
 import de.drolpi.conversion.core.converter.NonGenericConverter;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
@@ -29,18 +30,22 @@ public final class StringToEnumConverter implements NonGenericConverter {
     private final IntegerToEnumConverter helpConverter = new IntegerToEnumConverter();
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         return true;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }
 
         final String identifier = (String) source;
+        if (identifier.isEmpty()) {
+            return null;
+        }
+
         try {
             int id = Integer.parseInt(identifier);
             return this.helpConverter.convert(id, int.class, targetType);
@@ -48,10 +53,6 @@ public final class StringToEnumConverter implements NonGenericConverter {
 
         }
 
-        if (identifier.isEmpty()) {
-            // It's an empty enum identifier: reset the enum value to null.
-            return null;
-        }
         final Class<? extends Enum> enumType = (Class<? extends Enum>) GenericTypeReflector.erase(targetType);
         return Enum.valueOf(enumType, identifier.trim());
     }

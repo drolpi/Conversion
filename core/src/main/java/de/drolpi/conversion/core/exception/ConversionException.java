@@ -34,19 +34,19 @@ public abstract class ConversionException extends RuntimeException {
         this.sourceType = sourceType;
     }
 
-    public ConversionException(@NotNull Type sourceType, @NotNull Type targetType, String message) {
+    public ConversionException(Type sourceType, @NotNull Type targetType, String message) {
         super(message);
         this.sourceType = sourceType;
         this.targetType = targetType;
     }
 
-    public ConversionException(@NotNull Type sourceType, @NotNull Type targetType, String message, Throwable cause) {
+    public ConversionException(Type sourceType, @NotNull Type targetType, String message, Throwable cause) {
         super(message, cause);
         this.sourceType = sourceType;
         this.targetType = targetType;
     }
 
-    public @NotNull Type sourceType() {
+    public @Nullable Type sourceType() {
         return this.sourceType;
     }
 

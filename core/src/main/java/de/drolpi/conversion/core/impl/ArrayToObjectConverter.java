@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.impl;
 
 import de.drolpi.conversion.core.ConversionBus;
+import de.drolpi.conversion.core.converter.ConversionPath;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;

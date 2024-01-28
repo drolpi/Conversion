@@ -36,7 +36,7 @@ public abstract class AbstractElementToElementConverter<T> implements NonGeneric
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         final Type sourceParams = this.elementType(sourceType);
         final Type targetParams = this.elementType(targetType);
 
@@ -48,7 +48,7 @@ public abstract class AbstractElementToElementConverter<T> implements NonGeneric
     }
 
     @SuppressWarnings("unchecked")
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }

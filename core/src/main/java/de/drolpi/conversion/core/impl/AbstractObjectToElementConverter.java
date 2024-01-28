@@ -34,12 +34,12 @@ public abstract class AbstractObjectToElementConverter<T> implements NonGenericC
     }
 
     @Override
-    public boolean isSuitable(@NotNull Type sourceType, @NotNull Type targetType) {
+    public boolean isSuitable(@Nullable Type sourceType, @NotNull Type targetType) {
         return ConversionUtil.canConvertElements(sourceType, ConversionUtil.elementType(targetType, 1), this.conversionBus);
     }
 
     @Override
-    public @Nullable Object convert(@Nullable Object source, @NotNull Type sourceType, @NotNull Type targetType) {
+    public @Nullable Object convert(@Nullable Object source, @Nullable Type sourceType, @NotNull Type targetType) {
         if (source == null) {
             return null;
         }
