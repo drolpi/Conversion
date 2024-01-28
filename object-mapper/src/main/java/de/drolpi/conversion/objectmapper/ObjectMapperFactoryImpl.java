@@ -18,6 +18,7 @@ package de.drolpi.conversion.objectmapper;
 
 import de.drolpi.conversion.core.ConversionBus;
 import de.drolpi.conversion.objectmapper.discoverer.FieldDiscoverer;
+import de.drolpi.conversion.objectmapper.exception.ObjectMapperNotFoundException;
 import io.leangen.geantyref.GenericTypeReflector;
 import org.jetbrains.annotations.NotNull;
 
@@ -81,8 +82,7 @@ final class ObjectMapperFactoryImpl implements ObjectMapper.Factory {
                 return objectMapper;
             }
 
-            //TODO: Replace with own exception
-            throw new RuntimeException();
+            throw new ObjectMapperNotFoundException(type);
         }
     }
 

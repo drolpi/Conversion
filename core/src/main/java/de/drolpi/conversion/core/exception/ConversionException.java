@@ -17,6 +17,7 @@
 package de.drolpi.conversion.core.exception;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
@@ -26,7 +27,12 @@ import java.lang.reflect.Type;
 public abstract class ConversionException extends RuntimeException {
 
     private final Type sourceType;
-    private final Type targetType;
+    private Type targetType;
+
+    public ConversionException(@NotNull Type sourceType, String message) {
+        super(message);
+        this.sourceType = sourceType;
+    }
 
     public ConversionException(@NotNull Type sourceType, @NotNull Type targetType, String message) {
         super(message);
@@ -44,7 +50,7 @@ public abstract class ConversionException extends RuntimeException {
         return this.sourceType;
     }
 
-    public @NotNull Type targetType() {
+    public @Nullable Type targetType() {
         return this.targetType;
     }
 }
