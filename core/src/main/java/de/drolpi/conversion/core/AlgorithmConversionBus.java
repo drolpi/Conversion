@@ -43,6 +43,8 @@ class AlgorithmConversionBus extends BasicConversionBus {
 
     private static final class AlgorithmConverterRegistrar extends ConverterRegistrar {
 
+        private static final int MAX_DEPTH = 5;
+
         @Override
         protected NonGenericConverter find(@Nullable final Type sourceType, @NotNull final Type targetType) {
             requireNonNull(targetType, "targetType");
@@ -97,7 +99,7 @@ class AlgorithmConversionBus extends BasicConversionBus {
                     }
 
                     // Skip if the maximum depth is reached
-                    if (nextPath.size() == 5) {
+                    if (nextPath.size() == MAX_DEPTH) {
                         continue;
                     }
 
