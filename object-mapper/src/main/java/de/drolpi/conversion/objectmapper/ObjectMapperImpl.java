@@ -106,11 +106,6 @@ final class ObjectMapperImpl<T, U> implements ObjectMapper<T> {
             // Get value from field
             final Object fieldValue = fieldData.serializer().apply(value);
 
-            if (fieldValue == null) {
-                target.put(fieldData.name(), null);
-                continue;
-            }
-
             // Store value in map
             target.put(fieldData.name(), fieldValue);
         }
