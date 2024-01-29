@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
 public final class ConversionUtil {
 
     private ConversionUtil() {
-
+        throw new UnsupportedOperationException();
     }
 
     public static Type[] elementTypes(final Type type, int maxLength) {

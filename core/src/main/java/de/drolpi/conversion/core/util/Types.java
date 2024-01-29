@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
 public final class Types {
 
     private Types() {
-        throw new RuntimeException();
+        throw new UnsupportedOperationException();
     }
 
     @SuppressWarnings("unchecked")

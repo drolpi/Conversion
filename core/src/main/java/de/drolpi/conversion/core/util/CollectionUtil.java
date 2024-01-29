@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
 public final class CollectionUtil {
 
     private CollectionUtil() {
-
+        throw new UnsupportedOperationException();
     }
 
     public static Collection<Object> createCollection(final Type type, final Type elementType, final int length) {

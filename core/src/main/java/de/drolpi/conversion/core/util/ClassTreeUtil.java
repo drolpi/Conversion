@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
 public final class ClassTreeUtil {
 
     private ClassTreeUtil() {
-        throw new RuntimeException();
+        throw new UnsupportedOperationException();
     }
 
     public static @NotNull List<Class<?>> collect(@NotNull final Type type) {
