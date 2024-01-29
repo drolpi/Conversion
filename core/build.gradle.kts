@@ -14,3 +14,16 @@
  * limitations under the License.
  */
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    alias(libs.plugins.shadow)
+}
+
+tasks.withType<ShadowJar> {
+    archiveFileName.set("conversion-core.jar")
+    archiveVersion.set(null as String?)
+
+    // drop unused classes which are making the jar bigger
+    minimize()
+}

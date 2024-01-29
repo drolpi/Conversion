@@ -39,7 +39,6 @@ allprojects {
     apply(plugin = "maven-publish")
 
     apply(plugin = "java-library")
-    apply(plugin = "checkstyle")
     apply(plugin = "com.diffplug.spotless")
 
     dependencies {
@@ -70,16 +69,6 @@ allprojects {
         options.encoding = "UTF-8"
         options.isIncremental = true
 
-    }
-
-    tasks.withType<Checkstyle> {
-        maxErrors = 0
-        maxWarnings = 0
-        configFile = rootProject.file("checkstyle.xml")
-    }
-
-    extensions.configure<CheckstyleExtension> {
-        toolVersion = "10.3.4"
     }
 
     tasks.register<org.gradle.jvm.tasks.Jar>("javadocJar") {
